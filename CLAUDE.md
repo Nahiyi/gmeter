@@ -138,13 +138,12 @@ gometer run [参数]
 gometer/
 ├── cmd/
 │   ├── root.go           # CLI 入口，flag 定义
-│   └── run.go            # run 子命令
+│   └── run.go            # run 子命令，整合所有模块执行压测
 ├── internal/
 │   ├── config/           # 配置文件解析（JSON -> struct）
-│   ├── loader/            # 用户数据加载（users 数组 -> 线程映射）
+│   ├── loader/           # 用户数据加载（users 数组 -> 线程映射）
 │   ├── httpclient/       # HTTP 客户端封装（超时控制、请求发送）
-│   ├── runner/            # 压测运行器（线程调度、ramp-up、循环执行）
-│   ├── collector/         # 结果收集（并发安全的结果聚合）
+│   ├── collector/        # 结果收集（并发安全的结果聚合）
 │   └── reporter/         # JSON 报告生成
 ├── req.json.example      # 示例配置文件
 └── CLAUDE.md
