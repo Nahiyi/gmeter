@@ -139,7 +139,7 @@ func runThread(threadIndex int, cfg *config.Config, client *httpclient.Client, u
 		)
 
 		reqRecord := collector.RequestRecord{
-			RequestIndex:    1,
+			RequestIndex:    loopIndex,
 			URL:             cfg.Request.URL,
 			Method:          cfg.Request.Method,
 			RequestHeaders:  mergedHeaders,
