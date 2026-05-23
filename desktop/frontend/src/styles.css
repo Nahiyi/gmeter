@@ -417,7 +417,7 @@ textarea {
 
 .results-workbench {
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
   gap: 12px;
   width: 100%;
   max-width: 100%;
@@ -462,6 +462,48 @@ textarea {
 
 .result-kpi.bad strong {
   color: #bd3838;
+}
+
+.diagnostics-strip {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-left: 3px solid #3d566d;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 8px 10px 8px 8px;
+  overflow: hidden;
+}
+
+.diagnostics-title {
+  color: #394350;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.diagnostics-items {
+  display: flex;
+  min-width: 0;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.diagnostics-items span {
+  min-width: 0;
+  border: 1px solid #dde1e5;
+  border-radius: 999px;
+  background: #f8f9fa;
+  color: #4b5663;
+  padding: 4px 8px;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .analysis-strip {

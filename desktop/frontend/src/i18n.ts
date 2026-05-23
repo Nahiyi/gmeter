@@ -60,6 +60,12 @@ export type I18nKey =
   | "results.latencyDistribution"
   | "results.statusDistribution"
   | "results.slowestRequests"
+  | "results.diagnostics"
+  | "results.diagnosticsClean"
+  | "results.diagnosticsFailures"
+  | "results.diagnosticsSlowest"
+  | "results.diagnosticsStatusMix"
+  | "results.diagnosticsNoData"
   | "results.totalTraces"
   | "results.failedTraces"
   | "results.slowest"
@@ -162,6 +168,12 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.latencyDistribution": "Latency Distribution",
     "results.statusDistribution": "Status Distribution",
     "results.slowestRequests": "Slowest Requests",
+    "results.diagnostics": "Diagnostics",
+    "results.diagnosticsClean": "No failed traces captured.",
+    "results.diagnosticsFailures": "Failed traces",
+    "results.diagnosticsSlowest": "Slowest trace",
+    "results.diagnosticsStatusMix": "Dominant status",
+    "results.diagnosticsNoData": "Run data has not been captured yet.",
     "results.totalTraces": "Traces",
     "results.failedTraces": "Failed",
     "results.slowest": "Slowest",
@@ -263,6 +275,12 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.latencyDistribution": "延迟分布",
     "results.statusDistribution": "状态分布",
     "results.slowestRequests": "慢请求",
+    "results.diagnostics": "诊断摘要",
+    "results.diagnosticsClean": "暂无失败请求记录。",
+    "results.diagnosticsFailures": "失败请求",
+    "results.diagnosticsSlowest": "最慢请求",
+    "results.diagnosticsStatusMix": "主要状态",
+    "results.diagnosticsNoData": "尚未捕获运行数据。",
     "results.totalTraces": "请求记录",
     "results.failedTraces": "失败",
     "results.slowest": "最慢",

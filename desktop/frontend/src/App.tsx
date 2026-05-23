@@ -3,6 +3,7 @@ import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/d
 import { desktop, engine } from "../wailsjs/go/models";
 import { EventsOn } from "../wailsjs/runtime/runtime";
 import { getSavedLocale, I18nKey, Locale, saveLocale, translate } from "./i18n";
+import { buildResultStats, filterTraces, LatencyBucket, ResultGroup, ResultStats, TraceFilter } from "./resultStats";
 
 type HeaderRow = {
   id: string;
@@ -36,30 +37,6 @@ type RunEvent = {
 };
 
 type WorkbenchView = "config" | "results";
-type TraceFilter = "all" | "failed" | "success";
-
-type ResultGroup = {
-  label: string;
-  count: number;
-  percent?: number;
-};
-
-type LatencyBucket = {
-  label: string;
-  count: number;
-  percent: number;
-};
-
-type ResultStats = {
-  total: number;
-  failed: number;
-  failureRate: number;
-  slowest: desktop.TraceDTO | null;
-  errorGroups: ResultGroup[];
-  statusGroups: ResultGroup[];
-  latencyBuckets: LatencyBucket[];
-  slowestTraces: desktop.TraceDTO[];
-};
 
 const defaultRequest: RequestConfig = {
   url: "https://example.com/api",
@@ -477,6 +454,8 @@ function ResultsWorkbench(props: {
         <ResultKPI label={props.t("results.failureRate")} value={`${props.resultStats.failureRate.toFixed(1)}%`} tone={props.resultStats.failureRate > 0 ? "bad" : undefined} />
       </div>
 
+      <DiagnosticsSummary resultStats={props.resultStats} t={props.t} />
+
       <section className="analysis-strip">
         <GroupSummary title={props.t("results.failureGroups")} groups={props.resultStats.errorGroups} t={props.t} />
         <GroupSummary title={props.t("results.statusGroups")} groups={props.resultStats.statusGroups} t={props.t} />
@@ -542,6 +521,34 @@ function ResultsWorkbench(props: {
         <TraceInspector trace={props.selectedTrace} t={props.t} />
       </section>
     </div>
+  );
+}
+
+function DiagnosticsSummary(props: { resultStats: ResultStats; t: (key: I18nKey) => string }) {
+  const dominantStatus = props.resultStats.statusGroups[0];
+  const items = props.resultStats.total === 0 ? [
+    props.t("results.diagnosticsNoData")
+  ] : [
+    props.resultStats.failed > 0
+      ? `${props.t("results.diagnosticsFailures")}: ${props.resultStats.failed} / ${props.resultStats.total} (${props.resultStats.failureRate.toFixed(1)}%)`
+      : props.t("results.diagnosticsClean"),
+    props.resultStats.slowest
+      ? `${props.t("results.diagnosticsSlowest")}: T${props.resultStats.slowest.threadId} L${props.resultStats.slowest.loopIndex} ${props.resultStats.slowest.responseTimeMs}ms`
+      : props.t("results.diagnosticsNoData"),
+    dominantStatus
+      ? `${props.t("results.diagnosticsStatusMix")}: ${dominantStatus.label} (${(dominantStatus.percent ?? 0).toFixed(0)}%)`
+      : props.t("results.diagnosticsNoData")
+  ];
+
+  return (
+    <section className="diagnostics-strip" aria-label={props.t("results.diagnostics")}>
+      <div className="diagnostics-title">{props.t("results.diagnostics")}</div>
+      <div className="diagnostics-items">
+        {items.map((item) => (
+          <span key={item}>{item}</span>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -770,71 +777,6 @@ function headersFromRows(rows: HeaderRow[]) {
     }
     return headers;
   }, {});
-}
-
-function buildResultStats(traces: desktop.TraceDTO[]): ResultStats {
-  const failed = traces.filter((trace) => !trace.success).length;
-  const slowest = traces.reduce<desktop.TraceDTO | null>((current, trace) => {
-    if (!current || trace.responseTimeMs > current.responseTimeMs) {
-      return trace;
-    }
-    return current;
-  }, null);
-
-  return {
-    total: traces.length,
-    failed,
-    failureRate: traces.length === 0 ? 0 : (failed / traces.length) * 100,
-    slowest,
-    errorGroups: groupTraces(traces.filter((trace) => !trace.success), (trace) => trace.error || `HTTP ${trace.responseStatus || "ERR"}`),
-    statusGroups: groupTraces(traces, (trace) => String(trace.responseStatus || "ERR")),
-    latencyBuckets: buildLatencyBuckets(traces),
-    slowestTraces: [...traces].sort((a, b) => b.responseTimeMs - a.responseTimeMs).slice(0, 5)
-  };
-}
-
-function filterTraces(traces: desktop.TraceDTO[], filter: TraceFilter, search: string, status: string) {
-  const normalizedSearch = search.trim().toLowerCase();
-  return traces.filter((trace) => {
-    if (filter === "failed" && trace.success) return false;
-    if (filter === "success" && !trace.success) return false;
-    if (status !== "all" && String(trace.responseStatus || "ERR") !== status) return false;
-    if (!normalizedSearch) return true;
-    return trace.url.toLowerCase().includes(normalizedSearch) || trace.error.toLowerCase().includes(normalizedSearch);
-  });
-}
-
-function groupTraces(traces: desktop.TraceDTO[], labelForTrace: (trace: desktop.TraceDTO) => string) {
-  const counts = new Map<string, number>();
-  traces.forEach((trace) => {
-    const label = labelForTrace(trace);
-    counts.set(label, (counts.get(label) ?? 0) + 1);
-  });
-  return Array.from(counts.entries())
-    .map(([label, count]) => ({ label, count, percent: traces.length === 0 ? 0 : (count / traces.length) * 100 }))
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-}
-
-function buildLatencyBuckets(traces: desktop.TraceDTO[]) {
-  const buckets = [
-    { label: "0-50ms", max: 50, count: 0 },
-    { label: "51-100ms", max: 100, count: 0 },
-    { label: "101-300ms", max: 300, count: 0 },
-    { label: "301-1000ms", max: 1000, count: 0 },
-    { label: ">1000ms", max: Number.POSITIVE_INFINITY, count: 0 }
-  ];
-  traces.forEach((trace) => {
-    const bucket = buckets.find((item) => trace.responseTimeMs <= item.max);
-    if (bucket) {
-      bucket.count++;
-    }
-  });
-  const total = traces.length;
-  return buckets.map((bucket) => ({
-    label: bucket.label,
-    count: bucket.count,
-    percent: total === 0 ? 0 : (bucket.count / total) * 100
-  }));
 }
 
 function formatHeaders(headers?: Record<string, string>) {
