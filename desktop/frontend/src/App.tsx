@@ -8,9 +8,9 @@ import { RunSetupPanel } from "./components/RunSetupPanel";
 import { RunSummaryPanel } from "./components/RunSummaryPanel";
 import { Titlebar } from "./components/Titlebar";
 import { getSavedLocale, I18nKey, Locale, saveLocale, translate } from "./i18n";
-import { buildResultStats, filterTraces, TraceFilter } from "./resultStats";
+import { buildResultStats, LatencyRangeFilter, queryTraces, TraceFilter, TraceSort } from "./resultStats";
 import type { GmeterConfig, RequestConfig, UserRow, WorkbenchView } from "./types/config";
-import { createID, formatHeaders, headersFromRows, rowsFromHeaders } from "./utils/configRows";
+import { createID, headersFromRows, rowsFromHeaders } from "./utils/configRows";
 import { statusKeyFromRun } from "./utils/status";
 
 type RunEvent = {
@@ -53,8 +53,10 @@ function App() {
   const [selectedTrace, setSelectedTrace] = useState<desktop.TraceDTO | null>(null);
   const [workbenchView, setWorkbenchView] = useState<WorkbenchView>("config");
   const [traceFilter, setTraceFilter] = useState<TraceFilter>("all");
+  const [latencyRange, setLatencyRange] = useState<LatencyRangeFilter>("all");
   const [traceSearch, setTraceSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [traceSort, setTraceSort] = useState<TraceSort>("latest");
   const [consoleLines, setConsoleLines] = useState<string[]>([
     translate(getSavedLocale(), "console.ready")
   ]);
@@ -104,8 +106,8 @@ function App() {
     return Array.from(statuses).sort((a, b) => a.localeCompare(b));
   }, [recentTraces]);
   const filteredTraces = useMemo(
-    () => filterTraces(recentTraces, traceFilter, traceSearch, statusFilter),
-    [recentTraces, statusFilter, traceFilter, traceSearch]
+    () => queryTraces(recentTraces, { latencyRange, search: traceSearch, sort: traceSort, status: statusFilter, traceFilter }),
+    [latencyRange, recentTraces, statusFilter, traceFilter, traceSearch, traceSort]
   );
 
   const metrics = useMemo(
@@ -280,19 +282,23 @@ function App() {
             />
           ) : (
             <ResultsWorkbench
+              latencyRange={latencyRange}
               filteredTraces={filteredTraces}
               recentTraces={recentTraces}
               resultStats={resultStats}
               selectedTrace={selectedTrace}
+              setLatencyRange={setLatencyRange}
               setSelectedTrace={setSelectedTrace}
               setStatusFilter={setStatusFilter}
               setTraceFilter={setTraceFilter}
               setTraceSearch={setTraceSearch}
+              setTraceSort={setTraceSort}
               statusFilter={statusFilter}
               statusOptions={statusOptions}
               t={t}
               traceFilter={traceFilter}
               traceSearch={traceSearch}
+              traceSort={traceSort}
             />
           )}
         </section>

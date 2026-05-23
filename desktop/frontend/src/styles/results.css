@@ -234,7 +234,7 @@
 
 .trace-toolbar {
   display: grid;
-  grid-template-columns: auto minmax(150px, 1fr) 130px;
+  grid-template-columns: auto minmax(140px, 1fr) 118px 118px 118px;
   gap: 8px;
   border-bottom: 1px solid #dde1e5;
   background: #f2f4f6;
@@ -242,7 +242,9 @@
 }
 
 .trace-search,
-.status-filter {
+.status-filter,
+.latency-filter,
+.trace-sort {
   height: 28px;
   font-size: 12px;
 }
@@ -354,4 +356,15 @@ button.trace-table-row.selected {
 .response-evidence .detail-pre {
   max-height: none;
   min-height: 0;
+}
+
+@media (max-width: 1280px) {
+  .trace-toolbar {
+    grid-template-columns: auto minmax(160px, 1fr) 120px;
+  }
+
+  .latency-filter,
+  .trace-sort {
+    grid-column: span 1;
+  }
 }

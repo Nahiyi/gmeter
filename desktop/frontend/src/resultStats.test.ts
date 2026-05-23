@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { buildResultStats, filterTraces } from "./resultStats.js";
+import { buildResultStats, filterTraces, queryTraces } from "./resultStats.js";
 import type { TraceDTO } from "./resultStats.js";
 
 const traces: TraceDTO[] = [
@@ -72,5 +72,19 @@ describe("filterTraces", () => {
 
     assert.equal(filtered.length, 1);
     assert.equal(filtered[0].url, "https://example.com/fail");
+  });
+});
+
+describe("queryTraces", () => {
+  it("filters by latency range and sorts matching traces", () => {
+    const filtered = queryTraces(traces, {
+      latencyRange: "slow",
+      search: "",
+      sort: "latencyDesc",
+      status: "all",
+      traceFilter: "all"
+    });
+
+    assert.deepEqual(filtered.map((trace) => trace.responseTimeMs), [1200, 340]);
   });
 });

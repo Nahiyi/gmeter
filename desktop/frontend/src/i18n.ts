@@ -76,6 +76,14 @@ export type I18nKey =
   | "results.filterSuccess"
   | "results.search"
   | "results.allStatuses"
+  | "results.allLatency"
+  | "results.fastLatency"
+  | "results.normalLatency"
+  | "results.slowLatency"
+  | "results.sortLatest"
+  | "results.sortLatencyDesc"
+  | "results.sortLatencyAsc"
+  | "results.sortStatusAsc"
   | "results.thread"
   | "results.loop"
   | "results.request"
@@ -184,6 +192,14 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.filterSuccess": "Success",
     "results.search": "Search URL or error",
     "results.allStatuses": "All statuses",
+    "results.allLatency": "All latency",
+    "results.fastLatency": "<= 100 ms",
+    "results.normalLatency": "101-300 ms",
+    "results.slowLatency": "> 300 ms",
+    "results.sortLatest": "Latest",
+    "results.sortLatencyDesc": "Slowest first",
+    "results.sortLatencyAsc": "Fastest first",
+    "results.sortStatusAsc": "Status",
     "results.thread": "Thread",
     "results.loop": "Loop",
     "results.request": "Request",
@@ -291,6 +307,14 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.filterSuccess": "成功",
     "results.search": "搜索 URL 或错误",
     "results.allStatuses": "全部状态",
+    "results.allLatency": "全部耗时",
+    "results.fastLatency": "<= 100 ms",
+    "results.normalLatency": "101-300 ms",
+    "results.slowLatency": "> 300 ms",
+    "results.sortLatest": "最新优先",
+    "results.sortLatencyDesc": "最慢优先",
+    "results.sortLatencyAsc": "最快优先",
+    "results.sortStatusAsc": "按状态",
     "results.thread": "线程",
     "results.loop": "循环",
     "results.request": "请求",

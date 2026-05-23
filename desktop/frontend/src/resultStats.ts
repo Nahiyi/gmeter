@@ -1,4 +1,14 @@
 export type TraceFilter = "all" | "failed" | "success";
+export type LatencyRangeFilter = "all" | "fast" | "normal" | "slow";
+export type TraceSort = "latest" | "latencyDesc" | "latencyAsc" | "statusAsc";
+
+export type TraceQuery = {
+  latencyRange: LatencyRangeFilter;
+  search: string;
+  sort: TraceSort;
+  status: string;
+  traceFilter: TraceFilter;
+};
 
 export type TraceDTO = {
   threadId: number;
@@ -59,14 +69,53 @@ export function buildResultStats(traces: TraceDTO[]): ResultStats {
 }
 
 export function filterTraces(traces: TraceDTO[], filter: TraceFilter, search: string, status: string) {
-  const normalizedSearch = search.trim().toLowerCase();
+  return queryTraces(traces, {
+    latencyRange: "all",
+    search,
+    sort: "latest",
+    status,
+    traceFilter: filter
+  });
+}
+
+export function queryTraces(traces: TraceDTO[], query: TraceQuery) {
+  const normalizedSearch = query.search.trim().toLowerCase();
   return traces.filter((trace) => {
-    if (filter === "failed" && trace.success) return false;
-    if (filter === "success" && !trace.success) return false;
-    if (status !== "all" && String(trace.responseStatus || "ERR") !== status) return false;
+    if (query.traceFilter === "failed" && trace.success) return false;
+    if (query.traceFilter === "success" && !trace.success) return false;
+    if (query.status !== "all" && String(trace.responseStatus || "ERR") !== query.status) return false;
+    if (!matchesLatencyRange(trace, query.latencyRange)) return false;
     if (!normalizedSearch) return true;
     return trace.url.toLowerCase().includes(normalizedSearch) || trace.error.toLowerCase().includes(normalizedSearch);
-  });
+  }).sort((a, b) => compareTraces(a, b, query.sort));
+}
+
+function matchesLatencyRange(trace: TraceDTO, range: LatencyRangeFilter) {
+  switch (range) {
+    case "fast":
+      return trace.responseTimeMs <= 100;
+    case "normal":
+      return trace.responseTimeMs > 100 && trace.responseTimeMs <= 300;
+    case "slow":
+      return trace.responseTimeMs > 300;
+    case "all":
+    default:
+      return true;
+  }
+}
+
+function compareTraces(a: TraceDTO, b: TraceDTO, sort: TraceSort) {
+  switch (sort) {
+    case "latencyDesc":
+      return b.responseTimeMs - a.responseTimeMs;
+    case "latencyAsc":
+      return a.responseTimeMs - b.responseTimeMs;
+    case "statusAsc":
+      return String(a.responseStatus || "ERR").localeCompare(String(b.responseStatus || "ERR"));
+    case "latest":
+    default:
+      return 0;
+  }
 }
 
 function groupTraces(traces: TraceDTO[], labelForTrace: (trace: TraceDTO) => string) {

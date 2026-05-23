@@ -1,22 +1,26 @@
 import { desktop } from "../../../wailsjs/go/models";
 import type { I18nKey } from "../../i18n";
-import type { LatencyBucket, ResultGroup, ResultStats, TraceFilter } from "../../resultStats";
+import type { LatencyBucket, LatencyRangeFilter, ResultGroup, ResultStats, TraceFilter, TraceSort } from "../../resultStats";
 import { formatHeaders } from "../../utils/configRows";
 
 export function ResultsWorkbench(props: {
   filteredTraces: desktop.TraceDTO[];
+  latencyRange: LatencyRangeFilter;
   recentTraces: desktop.TraceDTO[];
   resultStats: ResultStats;
   selectedTrace: desktop.TraceDTO | null;
+  setLatencyRange: (range: LatencyRangeFilter) => void;
   setSelectedTrace: (trace: desktop.TraceDTO) => void;
   setStatusFilter: (status: string) => void;
   setTraceFilter: (filter: TraceFilter) => void;
   setTraceSearch: (search: string) => void;
+  setTraceSort: (sort: TraceSort) => void;
   statusFilter: string;
   statusOptions: string[];
   t: (key: I18nKey) => string;
   traceFilter: TraceFilter;
   traceSearch: string;
+  traceSort: TraceSort;
 }) {
   return (
     <div className="results-workbench">
@@ -56,6 +60,18 @@ export function ResultsWorkbench(props: {
               {props.statusOptions.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
+            </select>
+            <select className="latency-filter" value={props.latencyRange} onChange={(event) => props.setLatencyRange(event.target.value as LatencyRangeFilter)}>
+              <option value="all">{props.t("results.allLatency")}</option>
+              <option value="fast">{props.t("results.fastLatency")}</option>
+              <option value="normal">{props.t("results.normalLatency")}</option>
+              <option value="slow">{props.t("results.slowLatency")}</option>
+            </select>
+            <select className="trace-sort" value={props.traceSort} onChange={(event) => props.setTraceSort(event.target.value as TraceSort)}>
+              <option value="latest">{props.t("results.sortLatest")}</option>
+              <option value="latencyDesc">{props.t("results.sortLatencyDesc")}</option>
+              <option value="latencyAsc">{props.t("results.sortLatencyAsc")}</option>
+              <option value="statusAsc">{props.t("results.sortStatusAsc")}</option>
             </select>
           </div>
 
