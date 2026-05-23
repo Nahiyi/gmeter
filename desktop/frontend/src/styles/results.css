@@ -1,0 +1,357 @@
+.results-workbench {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.results-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.result-kpi {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: 58px;
+  border: 1px solid #d3d8de;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 9px 10px;
+  overflow: hidden;
+}
+
+.result-kpi span {
+  display: block;
+  color: #6a737f;
+  font-size: 12px;
+}
+
+.result-kpi strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 19px;
+  font-weight: 650;
+}
+
+.result-kpi.bad strong {
+  color: #bd3838;
+}
+
+.diagnostics-strip {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-left: 3px solid #3d566d;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 8px 10px 8px 8px;
+  overflow: hidden;
+}
+
+.diagnostics-title {
+  color: #394350;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.diagnostics-items {
+  display: flex;
+  min-width: 0;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.diagnostics-items span {
+  min-width: 0;
+  border: 1px solid #dde1e5;
+  border-radius: 999px;
+  background: #f8f9fa;
+  color: #4b5663;
+  padding: 4px 8px;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analysis-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 104px;
+  min-width: 0;
+}
+
+.group-summary {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.group-row {
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  gap: 8px;
+  border-bottom: 1px solid #edf0f3;
+  padding: 6px 10px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.group-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-row strong {
+  text-align: right;
+}
+
+.visual-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.distribution-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.bar-list,
+.slow-list {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.bar-track {
+  height: 8px;
+  border: 1px solid #d8dde3;
+  border-radius: 999px;
+  background: #f2f4f6;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: #3d566d;
+}
+
+.bar-fill.status {
+  background: #2f7a54;
+}
+
+.bar-row strong {
+  text-align: right;
+}
+
+.slow-row {
+  display: grid;
+  grid-template-columns: 62px 66px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.slow-row strong {
+  color: #1d232a;
+  text-align: right;
+}
+
+.slow-row em {
+  overflow: hidden;
+  color: #68717c;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trace-work-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.trace-table-panel,
+.trace-inspector {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.trace-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) 130px;
+  gap: 8px;
+  border-bottom: 1px solid #dde1e5;
+  background: #f2f4f6;
+  padding: 8px;
+}
+
+.trace-search,
+.status-filter {
+  height: 28px;
+  font-size: 12px;
+}
+
+.trace-table {
+  height: calc(100% - 45px);
+  overflow: auto;
+}
+
+.trace-table-row {
+  display: grid;
+  grid-template-columns: 60px 54px 62px 70px 76px minmax(180px, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  border: none;
+  border-bottom: 1px solid #edf0f3;
+  border-radius: 0;
+  background: #ffffff;
+  padding: 0 10px;
+  color: #1d232a;
+  font-size: 12px;
+  text-align: left;
+}
+
+.trace-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-height: 30px;
+  background: #f8f9fa;
+  color: #68717c;
+  font-weight: 650;
+}
+
+button.trace-table-row {
+  cursor: pointer;
+}
+
+button.trace-table-row:hover,
+button.trace-table-row.selected {
+  background: #eef5f1;
+}
+
+.trace-table-row.failed {
+  box-shadow: inset 3px 0 0 #bd3838;
+}
+
+.url-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trace-inspector {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(180px, 1fr);
+  overflow: auto;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 7px 10px;
+  padding: 10px;
+  color: #566171;
+  font-size: 12px;
+}
+
+.inspector-grid strong {
+  color: #1d232a;
+}
+
+.inspector-grid strong.ok,
+.trace-table-row strong.ok {
+  color: #226947;
+}
+
+.inspector-grid strong.bad,
+.trace-table-row strong.bad {
+  color: #bd3838;
+}
+
+.evidence-block {
+  min-height: 0;
+  border-top: 1px solid #edf0f3;
+}
+
+.response-evidence {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.evidence-line {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  padding: 8px 10px 0;
+  color: #566171;
+  font-size: 12px;
+}
+
+.evidence-line strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #1d232a;
+}
+
+.response-evidence .detail-pre {
+  max-height: none;
+  min-height: 0;
+}

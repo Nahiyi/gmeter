@@ -2,41 +2,20 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/desktop/App";
 import { desktop, engine } from "../wailsjs/go/models";
 import { EventsOn } from "../wailsjs/runtime/runtime";
+import { ConfigEditor } from "./components/config/ConfigEditor";
+import { ResultsWorkbench } from "./components/results/ResultsWorkbench";
+import { RunSetupPanel } from "./components/RunSetupPanel";
+import { RunSummaryPanel } from "./components/RunSummaryPanel";
+import { Titlebar } from "./components/Titlebar";
 import { getSavedLocale, I18nKey, Locale, saveLocale, translate } from "./i18n";
-import { buildResultStats, filterTraces, LatencyBucket, ResultGroup, ResultStats, TraceFilter } from "./resultStats";
-
-type HeaderRow = {
-  id: string;
-  key: string;
-  value: string;
-};
-
-type UserRow = {
-  id: string;
-  headers: HeaderRow[];
-};
-
-type RequestConfig = {
-  url: string;
-  method: string;
-  headers?: Record<string, string>;
-  body?: string;
-};
-
-type UserConfig = {
-  headers?: Record<string, string>;
-};
-
-type GmeterConfig = {
-  request: RequestConfig;
-  users?: UserConfig[];
-};
+import { buildResultStats, filterTraces, TraceFilter } from "./resultStats";
+import type { GmeterConfig, RequestConfig, UserRow, WorkbenchView } from "./types/config";
+import { createID, formatHeaders, headersFromRows, rowsFromHeaders } from "./utils/configRows";
+import { statusKeyFromRun } from "./utils/status";
 
 type RunEvent = {
   trace?: desktop.TraceDTO;
 };
-
-type WorkbenchView = "config" | "results";
 
 const defaultRequest: RequestConfig = {
   url: "https://example.com/api",
@@ -244,48 +223,35 @@ function App() {
 
   return (
     <main className="app-shell">
-      <header className="titlebar">
-        <div>
-          <strong>{t("app.title")}</strong>
-          <span>{t("app.subtitle")}</span>
-        </div>
-        <div className="titlebar-actions">
-          <input ref={fileInputRef} className="file-input" type="file" accept=".json,application/json" onChange={handleOpenFile} />
-          <select className="locale-select" value={locale} onChange={(event) => {
-            const nextLocale = event.target.value as Locale;
-            setLocale(nextLocale);
-            saveLocale(nextLocale);
-          }}>
-            <option value="en">EN</option>
-            <option value="zh">中文</option>
-          </select>
-          <button type="button" onClick={handleOpenClick}>{t("command.open")}</button>
-          <button type="button" onClick={handleSave}>{t("command.save")}</button>
-          {isRunning ? (
-            <button type="button" className="danger" onClick={handleStop}>{t("command.stop")}</button>
-          ) : (
-            <button type="button" className="primary" onClick={handleRun}>{t("command.run")}</button>
-          )}
-        </div>
-      </header>
+      <Titlebar
+        fileInputRef={fileInputRef}
+        isRunning={isRunning}
+        locale={locale}
+        onLocaleChange={(nextLocale) => {
+          setLocale(nextLocale);
+          saveLocale(nextLocale);
+        }}
+        onOpenClick={handleOpenClick}
+        onOpenFile={handleOpenFile}
+        onRun={handleRun}
+        onSave={handleSave}
+        onStop={handleStop}
+        t={t}
+      />
 
       <section className="workspace">
-        <aside className="panel setup-panel" aria-label="Run setup">
-          <div className="panel-heading">
-            <h1>{t("nav.runSetup")}</h1>
-            <span className="status idle">{status}</span>
-          </div>
-
-          <NumberField label={t("setup.threads")} min={1} value={threads} onChange={setThreads} />
-          <NumberField label={t("setup.rampUp")} min={0} value={rampUpSeconds} onChange={setRampUpSeconds} />
-          <NumberField label={t("setup.loops")} min={1} value={loops} onChange={setLoops} />
-          <NumberField label={t("setup.timeout")} min={1} value={requestTimeoutMs} onChange={setRequestTimeoutMs} />
-
-          <div className="toggle-row">
-            <span>{t("setup.dryRun")}</span>
-            <input type="checkbox" />
-          </div>
-        </aside>
+        <RunSetupPanel
+          loops={loops}
+          rampUpSeconds={rampUpSeconds}
+          requestTimeoutMs={requestTimeoutMs}
+          setLoops={setLoops}
+          setRampUpSeconds={setRampUpSeconds}
+          setRequestTimeoutMs={setRequestTimeoutMs}
+          setThreads={setThreads}
+          status={status}
+          t={t}
+          threads={threads}
+        />
 
         <section className="panel editor-panel" aria-label="Request configuration">
           <div className="panel-heading workbench-heading">
@@ -331,482 +297,18 @@ function App() {
           )}
         </section>
 
-        <aside className="panel results-panel" aria-label="Run results">
-          <div className="panel-heading">
-            <h2>{t("summary.title")}</h2>
-            <span>{status}</span>
-          </div>
-
-          <div className="metric-grid">
-            {metrics.map(([label, value]) => (
-              <div className="metric" key={label}>
-                <span>{label}</span>
-                <strong>{value}</strong>
-              </div>
-            ))}
-          </div>
-
-          <div className="console">
-            {consoleLines.map((line, index) => (
-              <div className={index === 0 ? "console-line" : "console-line muted"} key={`${line}-${index}`}>
-                {line}
-              </div>
-            ))}
-          </div>
-          <div className="trace-list">
-            <div className="trace-heading">{t("trace.recent")}</div>
-            {recentTraces.length === 0 ? (
-              <div className="trace-empty">{t("trace.empty")}</div>
-            ) : (
-              recentTraces.slice(0, 8).map((trace, index) => (
-                <button className="trace-row" type="button" onClick={() => setSelectedTrace(trace)} key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
-                  <span>T{trace.threadId} / L{trace.loopIndex}</span>
-                  <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
-                  <span>{trace.responseTimeMs}ms</span>
-                </button>
-              ))
-            )}
-          </div>
-        </aside>
+        <RunSummaryPanel
+          consoleLines={consoleLines}
+          metrics={metrics}
+          recentTraces={recentTraces}
+          selectedTrace={selectedTrace}
+          setSelectedTrace={setSelectedTrace}
+          status={status}
+          t={t}
+        />
       </section>
     </main>
   );
-}
-
-function NumberField(props: { label: string; min: number; value: number; onChange: (value: number) => void }) {
-  return (
-    <label>
-      {props.label}
-      <input type="number" min={props.min} value={props.value} onChange={(event) => props.onChange(Number(event.target.value))} />
-    </label>
-  );
-}
-
-function ConfigEditor(props: {
-  body: string;
-  configText: string;
-  method: string;
-  requestHeaders: HeaderRow[];
-  setBody: (body: string) => void;
-  setMethod: (method: string) => void;
-  setRequestHeaders: (rows: HeaderRow[]) => void;
-  setURL: (url: string) => void;
-  setUsers: (users: UserRow[]) => void;
-  t: (key: I18nKey) => string;
-  url: string;
-  users: UserRow[];
-}) {
-  return (
-    <div className="request-form">
-      <div className="request-line">
-        <label>
-          {props.t("request.method")}
-          <select value={props.method} onChange={(event) => props.setMethod(event.target.value)}>
-            {["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          {props.t("request.url")}
-          <input value={props.url} onChange={(event) => props.setURL(event.target.value)} />
-        </label>
-      </div>
-
-      <HeaderEditor title={props.t("request.headers")} addLabel={props.t("command.add")} deleteLabel={props.t("command.delete")} keyLabel={props.t("table.key")} valueLabel={props.t("table.value")} rows={props.requestHeaders} onChange={props.setRequestHeaders} />
-
-      <label className="body-editor">
-        {props.t("request.body")}
-        <textarea spellCheck="false" value={props.body} onChange={(event) => props.setBody(event.target.value)} />
-      </label>
-
-      <UserEditor users={props.users} onChange={props.setUsers} t={props.t} />
-
-      <label className="json-preview">
-        {props.t("request.jsonPreview")}
-        <textarea spellCheck="false" readOnly value={props.configText} />
-      </label>
-    </div>
-  );
-}
-
-function ResultsWorkbench(props: {
-  filteredTraces: desktop.TraceDTO[];
-  recentTraces: desktop.TraceDTO[];
-  resultStats: ResultStats;
-  selectedTrace: desktop.TraceDTO | null;
-  setSelectedTrace: (trace: desktop.TraceDTO) => void;
-  setStatusFilter: (status: string) => void;
-  setTraceFilter: (filter: TraceFilter) => void;
-  setTraceSearch: (search: string) => void;
-  statusFilter: string;
-  statusOptions: string[];
-  t: (key: I18nKey) => string;
-  traceFilter: TraceFilter;
-  traceSearch: string;
-}) {
-  return (
-    <div className="results-workbench">
-      <div className="results-kpis">
-        <ResultKPI label={props.t("results.totalTraces")} value={String(props.resultStats.total)} />
-        <ResultKPI label={props.t("results.failedTraces")} value={String(props.resultStats.failed)} tone={props.resultStats.failed > 0 ? "bad" : undefined} />
-        <ResultKPI label={props.t("results.slowest")} value={props.resultStats.slowest ? `${props.resultStats.slowest.responseTimeMs} ms` : "-- ms"} />
-        <ResultKPI label={props.t("results.failureRate")} value={`${props.resultStats.failureRate.toFixed(1)}%`} tone={props.resultStats.failureRate > 0 ? "bad" : undefined} />
-      </div>
-
-      <DiagnosticsSummary resultStats={props.resultStats} t={props.t} />
-
-      <section className="analysis-strip">
-        <GroupSummary title={props.t("results.failureGroups")} groups={props.resultStats.errorGroups} t={props.t} />
-        <GroupSummary title={props.t("results.statusGroups")} groups={props.resultStats.statusGroups} t={props.t} />
-      </section>
-
-      <section className="visual-strip">
-        <LatencyDistribution title={props.t("results.latencyDistribution")} buckets={props.resultStats.latencyBuckets} t={props.t} />
-        <StatusDistribution title={props.t("results.statusDistribution")} groups={props.resultStats.statusGroups} t={props.t} />
-        <SlowRequests title={props.t("results.slowestRequests")} traces={props.resultStats.slowestTraces} t={props.t} />
-      </section>
-
-      <section className="trace-work-area">
-        <div className="trace-table-panel">
-          <div className="trace-toolbar">
-            <div className="filter-group" aria-label={props.t("results.filter")}>
-              {(["all", "failed", "success"] as TraceFilter[]).map((filter) => (
-                <button key={filter} type="button" className={props.traceFilter === filter ? "active" : ""} onClick={() => props.setTraceFilter(filter)}>
-                  {props.t(filter === "all" ? "results.filterAll" : filter === "failed" ? "results.filterFailed" : "results.filterSuccess")}
-                </button>
-              ))}
-            </div>
-            <input className="trace-search" value={props.traceSearch} placeholder={props.t("results.search")} onChange={(event) => props.setTraceSearch(event.target.value)} />
-            <select className="status-filter" value={props.statusFilter} onChange={(event) => props.setStatusFilter(event.target.value)}>
-              <option value="all">{props.t("results.allStatuses")}</option>
-              {props.statusOptions.map((status) => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="trace-table" role="table" aria-label={props.t("results.traceTable")}>
-            <div className="trace-table-row trace-table-head" role="row">
-              <span>{props.t("results.thread")}</span>
-              <span>{props.t("results.loop")}</span>
-              <span>{props.t("results.method")}</span>
-              <span>{props.t("trace.status")}</span>
-              <span>{props.t("results.latency")}</span>
-              <span>{props.t("results.url")}</span>
-            </div>
-            {props.filteredTraces.length === 0 ? (
-              <div className="trace-empty">{props.recentTraces.length === 0 ? props.t("results.empty") : props.t("results.noMatches")}</div>
-            ) : (
-              props.filteredTraces.map((trace, index) => (
-                <button
-                  className={`trace-table-row ${trace.success ? "" : "failed"} ${props.selectedTrace === trace ? "selected" : ""}`}
-                  key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}
-                  onClick={() => props.setSelectedTrace(trace)}
-                  role="row"
-                  type="button"
-                >
-                  <span>T{trace.threadId}</span>
-                  <span>L{trace.loopIndex}</span>
-                  <span>{trace.method}</span>
-                  <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
-                  <span>{trace.responseTimeMs}ms</span>
-                  <span className="url-cell">{trace.url}</span>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-
-        <TraceInspector trace={props.selectedTrace} t={props.t} />
-      </section>
-    </div>
-  );
-}
-
-function DiagnosticsSummary(props: { resultStats: ResultStats; t: (key: I18nKey) => string }) {
-  const dominantStatus = props.resultStats.statusGroups[0];
-  const items = props.resultStats.total === 0 ? [
-    props.t("results.diagnosticsNoData")
-  ] : [
-    props.resultStats.failed > 0
-      ? `${props.t("results.diagnosticsFailures")}: ${props.resultStats.failed} / ${props.resultStats.total} (${props.resultStats.failureRate.toFixed(1)}%)`
-      : props.t("results.diagnosticsClean"),
-    props.resultStats.slowest
-      ? `${props.t("results.diagnosticsSlowest")}: T${props.resultStats.slowest.threadId} L${props.resultStats.slowest.loopIndex} ${props.resultStats.slowest.responseTimeMs}ms`
-      : props.t("results.diagnosticsNoData"),
-    dominantStatus
-      ? `${props.t("results.diagnosticsStatusMix")}: ${dominantStatus.label} (${(dominantStatus.percent ?? 0).toFixed(0)}%)`
-      : props.t("results.diagnosticsNoData")
-  ];
-
-  return (
-    <section className="diagnostics-strip" aria-label={props.t("results.diagnostics")}>
-      <div className="diagnostics-title">{props.t("results.diagnostics")}</div>
-      <div className="diagnostics-items">
-        {items.map((item) => (
-          <span key={item}>{item}</span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ResultKPI(props: { label: string; value: string; tone?: "bad" }) {
-  return (
-    <div className={`result-kpi ${props.tone ?? ""}`}>
-      <span>{props.label}</span>
-      <strong>{props.value}</strong>
-    </div>
-  );
-}
-
-function GroupSummary(props: { title: string; groups: ResultGroup[]; t: (key: I18nKey) => string }) {
-  return (
-    <div className="group-summary">
-      <div className="trace-heading">{props.title}</div>
-      {props.groups.length === 0 ? (
-        <div className="trace-empty">{props.t("results.none")}</div>
-      ) : (
-        props.groups.slice(0, 5).map((group) => (
-          <div className="group-row" key={group.label}>
-            <span>{group.label}</span>
-            <strong>{group.count}</strong>
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
-
-function LatencyDistribution(props: { title: string; buckets: LatencyBucket[]; t: (key: I18nKey) => string }) {
-  return (
-    <div className="distribution-panel">
-      <div className="trace-heading">{props.title}</div>
-      {props.buckets.every((bucket) => bucket.count === 0) ? (
-        <div className="trace-empty">{props.t("results.none")}</div>
-      ) : (
-        <div className="bar-list">
-          {props.buckets.map((bucket) => (
-            <div className="bar-row" key={bucket.label}>
-              <span>{bucket.label}</span>
-              <div className="bar-track"><div className="bar-fill" style={{ width: `${bucket.percent}%` }} /></div>
-              <strong>{bucket.count}</strong>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StatusDistribution(props: { title: string; groups: ResultGroup[]; t: (key: I18nKey) => string }) {
-  return (
-    <div className="distribution-panel">
-      <div className="trace-heading">{props.title}</div>
-      {props.groups.length === 0 ? (
-        <div className="trace-empty">{props.t("results.none")}</div>
-      ) : (
-        <div className="bar-list">
-          {props.groups.slice(0, 6).map((group) => (
-            <div className="bar-row" key={group.label}>
-              <span>{group.label}</span>
-              <div className="bar-track"><div className="bar-fill status" style={{ width: `${group.percent ?? 0}%` }} /></div>
-              <strong>{(group.percent ?? 0).toFixed(0)}%</strong>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SlowRequests(props: { title: string; traces: desktop.TraceDTO[]; t: (key: I18nKey) => string }) {
-  return (
-    <div className="distribution-panel">
-      <div className="trace-heading">{props.title}</div>
-      {props.traces.length === 0 ? (
-        <div className="trace-empty">{props.t("results.none")}</div>
-      ) : (
-        <div className="slow-list">
-          {props.traces.map((trace) => (
-            <div className="slow-row" key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}`}>
-              <span>T{trace.threadId} L{trace.loopIndex}</span>
-              <strong>{trace.responseTimeMs}ms</strong>
-              <em>{trace.url}</em>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKey) => string }) {
-  if (!props.trace) {
-    return (
-      <section className="trace-inspector">
-        <div className="trace-heading">{props.t("results.traceInspector")}</div>
-        <div className="trace-empty">{props.t("trace.noSelection")}</div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="trace-inspector">
-      <div className="trace-heading">{props.t("results.traceInspector")}</div>
-      <div className="inspector-grid">
-        <span>{props.t("results.thread")}</span>
-        <strong>T{props.trace.threadId}</strong>
-        <span>{props.t("results.loop")}</span>
-        <strong>L{props.trace.loopIndex}</strong>
-        <span>{props.t("results.request")}</span>
-        <strong>#{props.trace.requestIndex}</strong>
-        <span>{props.t("trace.status")}</span>
-        <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
-        <span>{props.t("results.latency")}</span>
-        <strong>{props.trace.responseTimeMs}ms</strong>
-      </div>
-      <div className="evidence-block">
-        <div className="trace-heading small">{props.t("results.requestEvidence")}</div>
-        <div className="evidence-line"><span>{props.t("results.method")}</span><strong>{props.trace.method}</strong></div>
-        <div className="evidence-line"><span>{props.t("results.url")}</span><strong>{props.trace.url}</strong></div>
-        <pre className="detail-pre">{formatHeaders(props.trace.requestHeaders)}</pre>
-      </div>
-      {props.trace.error ? (
-        <div className="evidence-block">
-          <div className="trace-heading small">{props.t("results.errorSummary")}</div>
-          <pre className="detail-pre bad">{props.trace.error}</pre>
-        </div>
-      ) : null}
-      <div className="evidence-block response-evidence">
-        <div className="trace-heading small">{props.t("results.responseEvidence")}</div>
-        <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
-      </div>
-    </section>
-  );
-}
-
-function HeaderEditor(props: { title: string; addLabel: string; deleteLabel: string; keyLabel: string; valueLabel: string; rows: HeaderRow[]; onChange: (rows: HeaderRow[]) => void }) {
-  function updateRow(id: string, patch: Partial<HeaderRow>) {
-    props.onChange(props.rows.map((row) => row.id === id ? { ...row, ...patch } : row));
-  }
-
-  return (
-    <section className="table-editor">
-      <div className="subheading">
-        <span>{props.title}</span>
-        <button type="button" onClick={() => props.onChange([...props.rows, { id: createID(), key: "", value: "" }])}>{props.addLabel}</button>
-      </div>
-      <div className="header-grid header-grid-head">
-        <span>{props.keyLabel}</span>
-        <span>{props.valueLabel}</span>
-        <span />
-      </div>
-      {props.rows.map((row) => (
-        <div className="header-grid" key={row.id}>
-          <input value={row.key} onChange={(event) => updateRow(row.id, { key: event.target.value })} />
-          <input value={row.value} onChange={(event) => updateRow(row.id, { value: event.target.value })} />
-          <button type="button" onClick={() => props.onChange(props.rows.filter((item) => item.id !== row.id))}>{props.deleteLabel}</button>
-        </div>
-      ))}
-    </section>
-  );
-}
-
-function UserEditor(props: { users: UserRow[]; onChange: (users: UserRow[]) => void; t: (key: I18nKey) => string }) {
-  function updateUser(userID: string, headers: HeaderRow[]) {
-    props.onChange(props.users.map((user) => user.id === userID ? { ...user, headers } : user));
-  }
-
-  return (
-    <section className="users-editor">
-      <div className="subheading">
-        <span>{props.t("request.userHeaders")}</span>
-        <button type="button" onClick={() => props.onChange([...props.users, { id: createID(), headers: [] }])}>{props.t("command.addUser")}</button>
-      </div>
-      {props.users.length === 0 ? (
-        <div className="trace-empty">{props.t("request.noUserHeaders")}</div>
-      ) : (
-        props.users.map((user, index) => (
-          <div className="user-block" key={user.id}>
-            <div className="user-title">
-              <span>{props.t("request.user")} {index + 1}</span>
-              <button type="button" onClick={() => props.onChange(props.users.filter((item) => item.id !== user.id))}>{props.t("command.remove")}</button>
-            </div>
-            <HeaderEditor title={props.t("request.headers")} addLabel={props.t("command.add")} deleteLabel={props.t("command.delete")} keyLabel={props.t("table.key")} valueLabel={props.t("table.value")} rows={user.headers} onChange={(rows) => updateUser(user.id, rows)} />
-          </div>
-        ))
-      )}
-    </section>
-  );
-}
-
-function TraceDetail(props: { trace: desktop.TraceDTO | null; t: (key: I18nKey) => string }) {
-  if (!props.trace) {
-    return (
-      <section className="trace-detail">
-        <div className="trace-heading">{props.t("trace.detail")}</div>
-        <div className="trace-empty">{props.t("trace.noSelection")}</div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="trace-detail">
-      <div className="trace-heading">{props.t("trace.detail")}</div>
-      <div className="detail-grid">
-        <span>{props.t("trace.status")}</span>
-        <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
-        <span>{props.t("trace.time")}</span>
-        <strong>{props.trace.responseTimeMs}ms</strong>
-      </div>
-      {props.trace.error ? (
-        <pre className="detail-pre bad">{props.trace.error}</pre>
-      ) : null}
-      <div className="trace-heading small">{props.t("trace.responseBody")}</div>
-      <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
-    </section>
-  );
-}
-
-function headersFromRows(rows: HeaderRow[]) {
-  return rows.reduce<Record<string, string>>((headers, row) => {
-    if (row.key.trim()) {
-      headers[row.key.trim()] = row.value;
-    }
-    return headers;
-  }, {});
-}
-
-function formatHeaders(headers?: Record<string, string>) {
-  if (!headers || Object.keys(headers).length === 0) {
-    return "{}";
-  }
-  return JSON.stringify(headers, null, 2);
-}
-
-function rowsFromHeaders(headers: Record<string, string>) {
-  const rows = Object.entries(headers).map(([key, value]) => ({ id: createID(), key, value }));
-  return rows.length > 0 ? rows : [{ id: createID(), key: "", value: "" }];
-}
-
-function createID() {
-  return Math.random().toString(36).slice(2);
-}
-
-function statusKeyFromRun(status?: string): I18nKey {
-  switch (status) {
-    case "running":
-      return "status.running";
-    case "completed":
-      return "status.complete";
-    case "canceled":
-      return "status.canceled";
-    case "idle":
-    default:
-      return "status.idle";
-  }
 }
 
 export default App;

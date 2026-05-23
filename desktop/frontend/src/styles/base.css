@@ -1,0 +1,165 @@
+:root {
+  color: #1d232a;
+  background: #e7e9ec;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 960px;
+  height: 100%;
+  min-height: 640px;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  height: 30px;
+  border: 1px solid #b7bdc5;
+  border-radius: 4px;
+  color: #1d232a;
+  background: #f6f7f8;
+  padding: 0 12px;
+}
+
+button.primary {
+  border-color: #266547;
+  color: #ffffff;
+  background: #2f7a54;
+}
+
+button.danger {
+  border-color: #9f2d2d;
+  color: #ffffff;
+  background: #bd3838;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+input,
+select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1d232a;
+  padding: 0 8px;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #20262d;
+  padding: 12px;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.segmented-control,
+.filter-group {
+  flex: 0 0 auto;
+  display: inline-flex;
+  border: 1px solid #b7bdc5;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.segmented-control button,
+.filter-group button {
+  height: 28px;
+  border: none;
+  border-right: 1px solid #c8cdd3;
+  border-radius: 0;
+  background: #ffffff;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.segmented-control button:last-child,
+.filter-group button:last-child {
+  border-right: none;
+}
+
+.segmented-control button.active,
+.filter-group button.active {
+  color: #ffffff;
+  background: #3d566d;
+}
+
+.status {
+  border: 1px solid #b8c0c9;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.status.idle {
+  color: #4b5663;
+  background: #edf0f3;
+}
+
+.trace-heading {
+  border-bottom: 1px solid #dde1e5;
+  background: #f2f4f6;
+  padding: 8px 10px;
+  color: #4b5663;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.trace-heading.small {
+  border-top: 1px solid #dde1e5;
+}
+
+.trace-empty {
+  padding: 12px 10px;
+  color: #7a8490;
+  font-size: 12px;
+}
+
+.detail-pre {
+  max-height: 110px;
+  margin: 0;
+  border-top: 1px solid #edf0f3;
+  background: #fbfcfd;
+  color: #20262d;
+  padding: 10px;
+  overflow: auto;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.detail-pre.bad {
+  color: #bd3838;
+}

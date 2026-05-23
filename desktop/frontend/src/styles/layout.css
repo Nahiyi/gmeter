@@ -1,0 +1,117 @@
+.app-shell {
+  display: grid;
+  grid-template-rows: 44px 1fr;
+  height: 100%;
+  background: #e7e9ec;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #c8cdd3;
+  background: #f2f3f5;
+  padding: 0 14px;
+}
+
+.titlebar strong {
+  margin-right: 10px;
+  font-size: 15px;
+}
+
+.titlebar span {
+  color: #68717c;
+  font-size: 13px;
+}
+
+.titlebar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.locale-select {
+  width: 74px;
+  height: 30px;
+}
+
+.file-input {
+  display: none;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(360px, 1fr) 300px;
+  gap: 1px;
+  min-height: 0;
+  background: #c8cdd3;
+}
+
+.panel {
+  min-width: 0;
+  min-height: 0;
+  background: #f8f9fa;
+  padding: 14px;
+}
+
+.panel-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  margin-bottom: 14px;
+}
+
+.panel-heading h1,
+.panel-heading h2 {
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-heading span {
+  color: #6a737f;
+  font-size: 12px;
+}
+
+.workbench-heading {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  padding-right: 116px;
+}
+
+.workbench-mode {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.workbench-heading .segmented-control {
+  position: absolute;
+  top: 1px;
+  right: 0;
+}
+
+.editor-panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.editor-panel > * {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 230px minmax(320px, 1fr) 260px;
+  }
+}
