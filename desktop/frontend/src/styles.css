@@ -112,15 +112,20 @@ button.danger {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   min-height: 30px;
   margin-bottom: 14px;
 }
 
 .panel-heading h1,
 .panel-heading h2 {
+  min-width: 0;
   margin: 0;
   font-size: 15px;
   font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .panel-heading span {
@@ -131,11 +136,22 @@ button.danger {
 .heading-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex: 0 1 360px;
+  min-width: 218px;
   gap: 10px;
+}
+
+.heading-actions > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .segmented-control,
 .filter-group {
+  flex: 0 0 auto;
   display: inline-flex;
   border: 1px solid #b7bdc5;
   border-radius: 4px;
@@ -545,6 +561,8 @@ button.trace-table-row.selected {
 }
 
 .trace-inspector {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(180px, 1fr);
   overflow: auto;
 }
 
@@ -572,7 +590,13 @@ button.trace-table-row.selected {
 }
 
 .evidence-block {
+  min-height: 0;
   border-top: 1px solid #edf0f3;
+}
+
+.response-evidence {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .evidence-line {
@@ -689,6 +713,11 @@ button.trace-table-row.selected {
   font-family: Consolas, "Cascadia Mono", monospace;
   font-size: 12px;
   white-space: pre-wrap;
+}
+
+.response-evidence .detail-pre {
+  max-height: none;
+  min-height: 0;
 }
 
 .detail-pre.bad {

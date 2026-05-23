@@ -596,7 +596,7 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
           <pre className="detail-pre bad">{props.trace.error}</pre>
         </div>
       ) : null}
-      <div className="evidence-block">
+      <div className="evidence-block response-evidence">
         <div className="trace-heading small">{props.t("results.responseEvidence")}</div>
         <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
       </div>
