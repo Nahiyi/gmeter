@@ -77,6 +77,10 @@ button.primary {
   gap: 8px;
 }
 
+.file-input {
+  display: none;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 260px minmax(360px, 1fr) 300px;
