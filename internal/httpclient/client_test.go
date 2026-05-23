@@ -1,6 +1,7 @@
 package httpclient
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,7 +28,7 @@ func TestDoRequestGetSuccess(t *testing.T) {
 	defer server.Close()
 
 	client := New(5000)
-	result := client.DoRequest("GET", server.URL, nil, "")
+	result := client.DoRequest(context.Background(), "GET", server.URL, nil, "")
 
 	if !result.Success {
 		t.Errorf("Expected success=true, got false. Error: %s", result.Error)
@@ -58,7 +59,7 @@ func TestDoRequestPostWithBody(t *testing.T) {
 	}
 	body := "data=test"
 
-	result := client.DoRequest("POST", server.URL, headers, body)
+	result := client.DoRequest(context.Background(), "POST", server.URL, headers, body)
 
 	if !result.Success {
 		t.Errorf("Expected success=true, got false. Error: %s", result.Error)
@@ -79,7 +80,7 @@ func TestDoRequestServerError(t *testing.T) {
 	defer server.Close()
 
 	client := New(5000)
-	result := client.DoRequest("GET", server.URL, nil, "")
+	result := client.DoRequest(context.Background(), "GET", server.URL, nil, "")
 
 	if result.Success {
 		t.Errorf("Expected success=false for 500 error, got true")
@@ -98,7 +99,7 @@ func TestDoRequestTimeout(t *testing.T) {
 
 	// Very short timeout
 	client := New(50)
-	result := client.DoRequest("GET", server.URL, nil, "")
+	result := client.DoRequest(context.Background(), "GET", server.URL, nil, "")
 
 	if result.Success {
 		t.Errorf("Expected success=false for timeout, got true")
@@ -110,7 +111,7 @@ func TestDoRequestTimeout(t *testing.T) {
 
 func TestDoRequestInvalidURL(t *testing.T) {
 	client := New(5000)
-	result := client.DoRequest("GET", "http://invalid-domain-that-does-not-exist.com", nil, "")
+	result := client.DoRequest(context.Background(), "GET", "http://invalid-domain-that-does-not-exist.com", nil, "")
 
 	if result.Success {
 		t.Errorf("Expected success=false for invalid URL, got true")
@@ -136,7 +137,7 @@ func TestDoRequestHeaderMerging(t *testing.T) {
 		"Authorization": "Bearer token123",
 	}
 
-	result := client.DoRequest("GET", server.URL, headers, "")
+	result := client.DoRequest(context.Background(), "GET", server.URL, headers, "")
 
 	if !result.Success {
 		t.Errorf("Expected success=true, got false. Error: %s", result.Error)

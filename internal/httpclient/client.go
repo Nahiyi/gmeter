@@ -36,7 +36,7 @@ func New(timeoutMs int) *Client {
 }
 
 // DoRequest performs an HTTP request and returns the result
-func (c *Client) DoRequest(method, url string, headers map[string]string, body string) *RequestResult {
+func (c *Client) DoRequest(ctx context.Context, method, url string, headers map[string]string, body string) *RequestResult {
 	start := time.Now()
 
 	// Build request
@@ -59,8 +59,12 @@ func (c *Client) DoRequest(method, url string, headers map[string]string, body s
 		req.Header.Set(k, v)
 	}
 
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	// Execute request with context for timeout
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
 	req = req.WithContext(ctx)
