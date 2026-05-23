@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"gmeter/internal/collector"
 	"gmeter/internal/engine"
 )
 
@@ -103,6 +104,38 @@ func TestStopRunCancelsActiveRun(t *testing.T) {
 	snapshot := waitForRunStatus(t, app, RunStatusCanceled)
 	if snapshot.Status != RunStatusCanceled {
 		t.Fatalf("expected canceled, got %s", snapshot.Status)
+	}
+}
+
+func TestDesktopEventSinkCopiesTraceExecutionCoordinates(t *testing.T) {
+	app := NewApp()
+	sink := desktopEventSink{app: app}
+	record := collector.RequestRecord{
+		RequestIndex:   3,
+		URL:            "https://example.com/api",
+		Method:         "GET",
+		ResponseStatus: http.StatusOK,
+		ResponseTimeMs: 42,
+		Success:        true,
+	}
+
+	sink.Publish(engine.RunEvent{
+		Type:      engine.EventRequestFinished,
+		ThreadID:  7,
+		LoopIndex: 2,
+		Request:   &record,
+	})
+
+	snapshot := app.GetRunSnapshot()
+	if len(snapshot.RecentTraces) != 1 {
+		t.Fatalf("expected one trace, got %d", len(snapshot.RecentTraces))
+	}
+	trace := snapshot.RecentTraces[0]
+	if trace.ThreadID != 7 || trace.LoopIndex != 2 {
+		t.Fatalf("expected thread 7 loop 2, got thread %d loop %d", trace.ThreadID, trace.LoopIndex)
+	}
+	if trace.RequestIndex != 3 {
+		t.Fatalf("expected request index 3, got %d", trace.RequestIndex)
 	}
 }
 

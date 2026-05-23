@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/desktop/App";
 import { desktop, engine } from "../wailsjs/go/models";
 import { EventsOn } from "../wailsjs/runtime/runtime";
+import { getSavedLocale, I18nKey, Locale, saveLocale, translate } from "./i18n";
 
 type HeaderRow = {
   id: string;
@@ -65,21 +66,25 @@ function App() {
   const [body, setBody] = useState(defaultRequest.body ?? "");
   const [users, setUsers] = useState<UserRow[]>(defaultUsers);
   const [snapshot, setSnapshot] = useState<desktop.RunSnapshot | null>(null);
-  const [status, setStatus] = useState("Idle");
+  const [statusKey, setStatusKey] = useState<I18nKey>("status.idle");
+  const [locale, setLocale] = useState<Locale>(getSavedLocale);
+  const [selectedTrace, setSelectedTrace] = useState<desktop.TraceDTO | null>(null);
   const [consoleLines, setConsoleLines] = useState<string[]>([
-    "Ready. Configure a GMeter load profile, then run."
+    translate(getSavedLocale(), "console.ready")
   ]);
+  const t = (key: I18nKey) => translate(locale, key);
+  const status = t(statusKey);
 
   useEffect(() => {
     GetRunSnapshot().then((nextSnapshot) => setSnapshot(nextSnapshot));
     const offSnapshot = EventsOn("gmeter:run:snapshot", (nextSnapshot: desktop.RunSnapshot) => {
       setSnapshot(nextSnapshot);
-      setStatus(statusLabel(nextSnapshot.status));
+      setStatusKey(statusKeyFromRun(nextSnapshot.status));
     });
     const offEvent = EventsOn("gmeter:run:event", (event: RunEvent) => {
       if (event.trace) {
         const trace = event.trace;
-        appendConsole(`Trace T${trace.threadId} L${trace.loopIndex}: HTTP ${trace.responseStatus} in ${trace.responseTimeMs}ms`);
+        appendConsole(`${translate(getSavedLocale(), "trace.consolePrefix")} T${trace.threadId} L${trace.loopIndex}: ${translate(getSavedLocale(), "trace.consoleHTTP")} ${trace.responseStatus} ${translate(getSavedLocale(), "trace.consoleIn")} ${trace.responseTimeMs}ms`);
       }
     });
     return () => {
@@ -110,14 +115,14 @@ function App() {
 
   const metrics = useMemo(
     () => [
-      ["Requests", String(summary?.totalRequests ?? 0)],
-      ["Success", String(summary?.successCount ?? 0)],
-      ["Failed", String(summary?.failCount ?? 0)],
-      ["Avg", summary ? `${summary.avgResponseTimeMs.toFixed(1)} ms` : "-- ms"],
-      ["P90", summary ? `${summary.p90ResponseTimeMs} ms` : "-- ms"],
-      ["P99", summary ? `${summary.p99ResponseTimeMs} ms` : "-- ms"]
+      [t("summary.requests"), String(summary?.totalRequests ?? 0)],
+      [t("summary.success"), String(summary?.successCount ?? 0)],
+      [t("summary.failed"), String(summary?.failCount ?? 0)],
+      [t("summary.avg"), summary ? `${summary.avgResponseTimeMs.toFixed(1)} ms` : "-- ms"],
+      [t("summary.p90"), summary ? `${summary.p90ResponseTimeMs} ms` : "-- ms"],
+      [t("summary.p99"), summary ? `${summary.p99ResponseTimeMs} ms` : "-- ms"]
     ],
-    [summary]
+    [locale, summary]
   );
 
   function appendConsole(line: string) {
@@ -150,31 +155,31 @@ function App() {
   }
 
   async function handleRun() {
-    setStatus("Running");
-    appendConsole("Starting run...");
+    setStatusKey("status.running");
+    appendConsole(t("console.starting"));
     try {
       const plan = buildPlan();
       const validation = await ValidatePlan(plan, runOptions());
       if (validation) {
-        setStatus("Invalid");
-        appendConsole(`Validation failed: ${validation}`);
+        setStatusKey("status.invalid");
+        appendConsole(`${t("console.validationFailed")}: ${validation}`);
         return;
       }
 
       const runID = await StartRun(plan, runOptions());
-      appendConsole(`Run started: ${runID}`);
+      appendConsole(`${t("console.runStarted")}: ${runID}`);
     } catch (error) {
-      setStatus("Failed");
-      appendConsole(`Run failed: ${error instanceof Error ? error.message : String(error)}`);
+      setStatusKey("status.failed");
+      appendConsole(`${t("console.runFailed")}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   async function handleStop() {
     try {
       await StopRun();
-      appendConsole("Stop requested.");
+      appendConsole(t("console.stopRequested"));
     } catch (error) {
-      appendConsole(`Stop failed: ${error instanceof Error ? error.message : String(error)}`);
+      appendConsole(`${t("console.stopFailed")}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -186,7 +191,7 @@ function App() {
     link.download = "gmeter-config.json";
     link.click();
     URL.revokeObjectURL(objectURL);
-    appendConsole("Config exported.");
+    appendConsole(t("console.exported"));
   }
 
   function handleOpenClick() {
@@ -200,9 +205,9 @@ function App() {
     reader.onload = () => {
       try {
         applyConfig(JSON.parse(String(reader.result ?? "")) as GmeterConfig);
-        appendConsole(`Loaded config: ${file.name}`);
+        appendConsole(`${t("console.loaded")}: ${file.name}`);
       } catch (error) {
-        appendConsole(`Open failed: ${error instanceof Error ? error.message : String(error)}`);
+        appendConsole(`${t("console.openFailed")}: ${error instanceof Error ? error.message : String(error)}`);
       }
     };
     reader.readAsText(file);
@@ -224,17 +229,25 @@ function App() {
     <main className="app-shell">
       <header className="titlebar">
         <div>
-          <strong>GMeter</strong>
-          <span>Desktop Workbench</span>
+          <strong>{t("app.title")}</strong>
+          <span>{t("app.subtitle")}</span>
         </div>
         <div className="titlebar-actions">
           <input ref={fileInputRef} className="file-input" type="file" accept=".json,application/json" onChange={handleOpenFile} />
-          <button type="button" onClick={handleOpenClick}>Open</button>
-          <button type="button" onClick={handleSave}>Save</button>
+          <select className="locale-select" value={locale} onChange={(event) => {
+            const nextLocale = event.target.value as Locale;
+            setLocale(nextLocale);
+            saveLocale(nextLocale);
+          }}>
+            <option value="en">EN</option>
+            <option value="zh">中文</option>
+          </select>
+          <button type="button" onClick={handleOpenClick}>{t("command.open")}</button>
+          <button type="button" onClick={handleSave}>{t("command.save")}</button>
           {isRunning ? (
-            <button type="button" className="danger" onClick={handleStop}>Stop</button>
+            <button type="button" className="danger" onClick={handleStop}>{t("command.stop")}</button>
           ) : (
-            <button type="button" className="primary" onClick={handleRun}>Run</button>
+            <button type="button" className="primary" onClick={handleRun}>{t("command.run")}</button>
           )}
         </div>
       </header>
@@ -242,31 +255,31 @@ function App() {
       <section className="workspace">
         <aside className="panel setup-panel" aria-label="Run setup">
           <div className="panel-heading">
-            <h1>Run Setup</h1>
+            <h1>{t("nav.runSetup")}</h1>
             <span className="status idle">{status}</span>
           </div>
 
-          <NumberField label="Threads" min={1} value={threads} onChange={setThreads} />
-          <NumberField label="Ramp-Up Seconds" min={0} value={rampUpSeconds} onChange={setRampUpSeconds} />
-          <NumberField label="Loops Per Thread" min={1} value={loops} onChange={setLoops} />
-          <NumberField label="Request Timeout" min={1} value={requestTimeoutMs} onChange={setRequestTimeoutMs} />
+          <NumberField label={t("setup.threads")} min={1} value={threads} onChange={setThreads} />
+          <NumberField label={t("setup.rampUp")} min={0} value={rampUpSeconds} onChange={setRampUpSeconds} />
+          <NumberField label={t("setup.loops")} min={1} value={loops} onChange={setLoops} />
+          <NumberField label={t("setup.timeout")} min={1} value={requestTimeoutMs} onChange={setRequestTimeoutMs} />
 
           <div className="toggle-row">
-            <span>Dry Run</span>
+            <span>{t("setup.dryRun")}</span>
             <input type="checkbox" />
           </div>
         </aside>
 
         <section className="panel editor-panel" aria-label="Request configuration">
           <div className="panel-heading">
-            <h2>Request Profile</h2>
-            <span>form + JSON preview</span>
+            <h2>{t("request.profile")}</h2>
+            <span>{t("request.profileMode")}</span>
           </div>
 
           <div className="request-form">
             <div className="request-line">
               <label>
-                Method
+                {t("request.method")}
                 <select value={method} onChange={(event) => setMethod(event.target.value)}>
                   {["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].map((item) => (
                     <option key={item} value={item}>{item}</option>
@@ -274,22 +287,22 @@ function App() {
                 </select>
               </label>
               <label>
-                URL
+                {t("request.url")}
                 <input value={url} onChange={(event) => setURL(event.target.value)} />
               </label>
             </div>
 
-            <HeaderEditor title="Request Headers" rows={requestHeaders} onChange={setRequestHeaders} />
+            <HeaderEditor title={t("request.headers")} addLabel={t("command.add")} deleteLabel={t("command.delete")} keyLabel={t("table.key")} valueLabel={t("table.value")} rows={requestHeaders} onChange={setRequestHeaders} />
 
             <label className="body-editor">
-              Body
+              {t("request.body")}
               <textarea spellCheck="false" value={body} onChange={(event) => setBody(event.target.value)} />
             </label>
 
-            <UserEditor users={users} onChange={setUsers} />
+            <UserEditor users={users} onChange={setUsers} t={t} />
 
             <label className="json-preview">
-              JSON Preview
+              {t("request.jsonPreview")}
               <textarea spellCheck="false" readOnly value={configText} />
             </label>
           </div>
@@ -297,7 +310,7 @@ function App() {
 
         <aside className="panel results-panel" aria-label="Run results">
           <div className="panel-heading">
-            <h2>Live Summary</h2>
+            <h2>{t("summary.title")}</h2>
             <span>{status}</span>
           </div>
 
@@ -318,19 +331,20 @@ function App() {
             ))}
           </div>
           <div className="trace-list">
-            <div className="trace-heading">Recent Traces</div>
+            <div className="trace-heading">{t("trace.recent")}</div>
             {recentTraces.length === 0 ? (
-              <div className="trace-empty">No request traces yet.</div>
+              <div className="trace-empty">{t("trace.empty")}</div>
             ) : (
               recentTraces.slice(0, 8).map((trace, index) => (
-                <div className="trace-row" key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
+                <button className="trace-row" type="button" onClick={() => setSelectedTrace(trace)} key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
                   <span>T{trace.threadId} / L{trace.loopIndex}</span>
                   <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
                   <span>{trace.responseTimeMs}ms</span>
-                </div>
+                </button>
               ))
             )}
           </div>
+          <TraceDetail trace={selectedTrace} t={t} />
         </aside>
       </section>
     </main>
@@ -346,7 +360,7 @@ function NumberField(props: { label: string; min: number; value: number; onChang
   );
 }
 
-function HeaderEditor(props: { title: string; rows: HeaderRow[]; onChange: (rows: HeaderRow[]) => void }) {
+function HeaderEditor(props: { title: string; addLabel: string; deleteLabel: string; keyLabel: string; valueLabel: string; rows: HeaderRow[]; onChange: (rows: HeaderRow[]) => void }) {
   function updateRow(id: string, patch: Partial<HeaderRow>) {
     props.onChange(props.rows.map((row) => row.id === id ? { ...row, ...patch } : row));
   }
@@ -355,25 +369,25 @@ function HeaderEditor(props: { title: string; rows: HeaderRow[]; onChange: (rows
     <section className="table-editor">
       <div className="subheading">
         <span>{props.title}</span>
-        <button type="button" onClick={() => props.onChange([...props.rows, { id: createID(), key: "", value: "" }])}>Add</button>
+        <button type="button" onClick={() => props.onChange([...props.rows, { id: createID(), key: "", value: "" }])}>{props.addLabel}</button>
       </div>
       <div className="header-grid header-grid-head">
-        <span>Key</span>
-        <span>Value</span>
+        <span>{props.keyLabel}</span>
+        <span>{props.valueLabel}</span>
         <span />
       </div>
       {props.rows.map((row) => (
         <div className="header-grid" key={row.id}>
           <input value={row.key} onChange={(event) => updateRow(row.id, { key: event.target.value })} />
           <input value={row.value} onChange={(event) => updateRow(row.id, { value: event.target.value })} />
-          <button type="button" onClick={() => props.onChange(props.rows.filter((item) => item.id !== row.id))}>Del</button>
+          <button type="button" onClick={() => props.onChange(props.rows.filter((item) => item.id !== row.id))}>{props.deleteLabel}</button>
         </div>
       ))}
     </section>
   );
 }
 
-function UserEditor(props: { users: UserRow[]; onChange: (users: UserRow[]) => void }) {
+function UserEditor(props: { users: UserRow[]; onChange: (users: UserRow[]) => void; t: (key: I18nKey) => string }) {
   function updateUser(userID: string, headers: HeaderRow[]) {
     props.onChange(props.users.map((user) => user.id === userID ? { ...user, headers } : user));
   }
@@ -381,22 +395,50 @@ function UserEditor(props: { users: UserRow[]; onChange: (users: UserRow[]) => v
   return (
     <section className="users-editor">
       <div className="subheading">
-        <span>User Headers</span>
-        <button type="button" onClick={() => props.onChange([...props.users, { id: createID(), headers: [] }])}>Add User</button>
+        <span>{props.t("request.userHeaders")}</span>
+        <button type="button" onClick={() => props.onChange([...props.users, { id: createID(), headers: [] }])}>{props.t("command.addUser")}</button>
       </div>
       {props.users.length === 0 ? (
-        <div className="trace-empty">No user headers. Requests will use shared headers only.</div>
+        <div className="trace-empty">{props.t("request.noUserHeaders")}</div>
       ) : (
         props.users.map((user, index) => (
           <div className="user-block" key={user.id}>
             <div className="user-title">
-              <span>User {index + 1}</span>
-              <button type="button" onClick={() => props.onChange(props.users.filter((item) => item.id !== user.id))}>Remove</button>
+              <span>{props.t("request.user")} {index + 1}</span>
+              <button type="button" onClick={() => props.onChange(props.users.filter((item) => item.id !== user.id))}>{props.t("command.remove")}</button>
             </div>
-            <HeaderEditor title="Headers" rows={user.headers} onChange={(rows) => updateUser(user.id, rows)} />
+            <HeaderEditor title={props.t("request.headers")} addLabel={props.t("command.add")} deleteLabel={props.t("command.delete")} keyLabel={props.t("table.key")} valueLabel={props.t("table.value")} rows={user.headers} onChange={(rows) => updateUser(user.id, rows)} />
           </div>
         ))
       )}
+    </section>
+  );
+}
+
+function TraceDetail(props: { trace: desktop.TraceDTO | null; t: (key: I18nKey) => string }) {
+  if (!props.trace) {
+    return (
+      <section className="trace-detail">
+        <div className="trace-heading">{props.t("trace.detail")}</div>
+        <div className="trace-empty">{props.t("trace.noSelection")}</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="trace-detail">
+      <div className="trace-heading">{props.t("trace.detail")}</div>
+      <div className="detail-grid">
+        <span>{props.t("trace.status")}</span>
+        <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
+        <span>{props.t("trace.time")}</span>
+        <strong>{props.trace.responseTimeMs}ms</strong>
+      </div>
+      {props.trace.error ? (
+        <pre className="detail-pre bad">{props.trace.error}</pre>
+      ) : null}
+      <div className="trace-heading small">{props.t("trace.responseBody")}</div>
+      <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
     </section>
   );
 }
@@ -419,17 +461,17 @@ function createID() {
   return Math.random().toString(36).slice(2);
 }
 
-function statusLabel(status?: string) {
+function statusKeyFromRun(status?: string): I18nKey {
   switch (status) {
     case "running":
-      return "Running";
+      return "status.running";
     case "completed":
-      return "Complete";
+      return "status.complete";
     case "canceled":
-      return "Canceled";
+      return "status.canceled";
     case "idle":
     default:
-      return "Idle";
+      return "status.idle";
   }
 }
 

@@ -155,6 +155,8 @@ func (s desktopEventSink) Publish(event engine.RunEvent) {
 	}
 	if event.Request != nil {
 		trace := traceDTOFromRecord(*event.Request)
+		trace.ThreadID = event.ThreadID
+		trace.LoopIndex = event.LoopIndex
 		dto.Trace = &trace
 	}
 
