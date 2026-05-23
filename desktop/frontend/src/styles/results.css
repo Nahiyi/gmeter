@@ -239,12 +239,19 @@
   border-bottom: 1px solid #dde1e5;
   background: #f2f4f6;
   padding: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.trace-toolbar .filter-group {
+  min-width: max-content;
 }
 
 .trace-search,
 .status-filter,
 .latency-filter,
 .trace-sort {
+  min-width: 0;
   height: 28px;
   font-size: 12px;
 }
@@ -301,7 +308,12 @@ button.trace-table-row.selected {
 
 .trace-inspector {
   display: grid;
-  grid-template-rows: auto auto auto minmax(180px, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.trace-inspector-body {
+  min-height: 0;
   overflow: auto;
 }
 
@@ -334,8 +346,7 @@ button.trace-table-row.selected {
 }
 
 .response-evidence {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 160px;
 }
 
 .evidence-line {
@@ -354,13 +365,13 @@ button.trace-table-row.selected {
 }
 
 .response-evidence .detail-pre {
-  max-height: none;
+  max-height: 280px;
   min-height: 0;
 }
 
 @media (max-width: 1280px) {
   .trace-toolbar {
-    grid-template-columns: auto minmax(160px, 1fr) 120px;
+    grid-template-columns: max-content minmax(160px, 1fr) 120px 120px 120px;
   }
 
   .latency-filter,

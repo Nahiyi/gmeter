@@ -97,6 +97,7 @@ textarea {
 
 .segmented-control button,
 .filter-group button {
+  min-width: 48px;
   height: 28px;
   border: none;
   border-right: 1px solid #c8cdd3;
@@ -104,6 +105,8 @@ textarea {
   background: #ffffff;
   padding: 0 10px;
   font-size: 12px;
+  line-height: 28px;
+  white-space: nowrap;
 }
 
 .segmented-control button:last-child,

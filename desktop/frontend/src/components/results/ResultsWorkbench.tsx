@@ -244,33 +244,35 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
   return (
     <section className="trace-inspector">
       <div className="trace-heading">{props.t("results.traceInspector")}</div>
-      <div className="inspector-grid">
-        <span>{props.t("results.thread")}</span>
-        <strong>T{props.trace.threadId}</strong>
-        <span>{props.t("results.loop")}</span>
-        <strong>L{props.trace.loopIndex}</strong>
-        <span>{props.t("results.request")}</span>
-        <strong>#{props.trace.requestIndex}</strong>
-        <span>{props.t("trace.status")}</span>
-        <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
-        <span>{props.t("results.latency")}</span>
-        <strong>{props.trace.responseTimeMs}ms</strong>
-      </div>
-      <div className="evidence-block">
-        <div className="trace-heading small">{props.t("results.requestEvidence")}</div>
-        <div className="evidence-line"><span>{props.t("results.method")}</span><strong>{props.trace.method}</strong></div>
-        <div className="evidence-line"><span>{props.t("results.url")}</span><strong>{props.trace.url}</strong></div>
-        <pre className="detail-pre">{formatHeaders(props.trace.requestHeaders)}</pre>
-      </div>
-      {props.trace.error ? (
-        <div className="evidence-block">
-          <div className="trace-heading small">{props.t("results.errorSummary")}</div>
-          <pre className="detail-pre bad">{props.trace.error}</pre>
+      <div className="trace-inspector-body">
+        <div className="inspector-grid">
+          <span>{props.t("results.thread")}</span>
+          <strong>T{props.trace.threadId}</strong>
+          <span>{props.t("results.loop")}</span>
+          <strong>L{props.trace.loopIndex}</strong>
+          <span>{props.t("results.request")}</span>
+          <strong>#{props.trace.requestIndex}</strong>
+          <span>{props.t("trace.status")}</span>
+          <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
+          <span>{props.t("results.latency")}</span>
+          <strong>{props.trace.responseTimeMs}ms</strong>
         </div>
-      ) : null}
-      <div className="evidence-block response-evidence">
-        <div className="trace-heading small">{props.t("results.responseEvidence")}</div>
-        <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
+        <div className="evidence-block">
+          <div className="trace-heading small">{props.t("results.requestEvidence")}</div>
+          <div className="evidence-line"><span>{props.t("results.method")}</span><strong>{props.trace.method}</strong></div>
+          <div className="evidence-line"><span>{props.t("results.url")}</span><strong>{props.trace.url}</strong></div>
+          <pre className="detail-pre">{formatHeaders(props.trace.requestHeaders)}</pre>
+        </div>
+        {props.trace.error ? (
+          <div className="evidence-block">
+            <div className="trace-heading small">{props.t("results.errorSummary")}</div>
+            <pre className="detail-pre bad">{props.trace.error}</pre>
+          </div>
+        ) : null}
+        <div className="evidence-block response-evidence">
+          <div className="trace-heading small">{props.t("results.responseEvidence")}</div>
+          <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
+        </div>
       </div>
     </section>
   );
