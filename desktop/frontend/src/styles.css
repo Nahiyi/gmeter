@@ -417,7 +417,7 @@ textarea {
 
 .results-workbench {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 12px;
   width: 100%;
   max-width: 100%;
@@ -513,6 +513,86 @@ textarea {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+}
+
+.visual-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.distribution-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.bar-list,
+.slow-list {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.bar-track {
+  height: 8px;
+  border: 1px solid #d8dde3;
+  border-radius: 999px;
+  background: #f2f4f6;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: #3d566d;
+}
+
+.bar-fill.status {
+  background: #2f7a54;
+}
+
+.bar-row strong {
+  text-align: right;
+}
+
+.slow-row {
+  display: grid;
+  grid-template-columns: 62px 66px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.slow-row strong {
+  color: #1d232a;
+  text-align: right;
+}
+
+.slow-row em {
+  overflow: hidden;
+  color: #68717c;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .trace-table-panel,

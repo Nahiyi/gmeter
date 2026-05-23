@@ -57,6 +57,9 @@ export type I18nKey =
   | "results.traceInspector"
   | "results.failureGroups"
   | "results.statusGroups"
+  | "results.latencyDistribution"
+  | "results.statusDistribution"
+  | "results.slowestRequests"
   | "results.totalTraces"
   | "results.failedTraces"
   | "results.slowest"
@@ -80,6 +83,7 @@ export type I18nKey =
   | "results.body"
   | "results.errorSummary"
   | "results.none"
+  | "results.percentage"
   | "console.ready"
   | "console.starting"
   | "console.loaded"
@@ -155,6 +159,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.traceInspector": "Trace Inspector",
     "results.failureGroups": "Failure Groups",
     "results.statusGroups": "Status Codes",
+    "results.latencyDistribution": "Latency Distribution",
+    "results.statusDistribution": "Status Distribution",
+    "results.slowestRequests": "Slowest Requests",
     "results.totalTraces": "Traces",
     "results.failedTraces": "Failed",
     "results.slowest": "Slowest",
@@ -178,6 +185,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.body": "Body",
     "results.errorSummary": "Error Summary",
     "results.none": "None",
+    "results.percentage": "Share",
     "console.ready": "Ready. Configure a GMeter load profile, then run.",
     "console.starting": "Starting run...",
     "console.loaded": "Loaded config",
@@ -252,6 +260,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.traceInspector": "请求检查器",
     "results.failureGroups": "失败分组",
     "results.statusGroups": "状态码",
+    "results.latencyDistribution": "延迟分布",
+    "results.statusDistribution": "状态分布",
+    "results.slowestRequests": "慢请求",
     "results.totalTraces": "请求记录",
     "results.failedTraces": "失败",
     "results.slowest": "最慢",
@@ -275,6 +286,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.body": "请求体",
     "results.errorSummary": "错误摘要",
     "results.none": "无",
+    "results.percentage": "占比",
     "console.ready": "就绪。配置 GMeter 压测计划后运行。",
     "console.starting": "开始运行...",
     "console.loaded": "已加载配置",

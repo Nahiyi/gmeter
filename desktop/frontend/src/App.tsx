@@ -41,6 +41,13 @@ type TraceFilter = "all" | "failed" | "success";
 type ResultGroup = {
   label: string;
   count: number;
+  percent?: number;
+};
+
+type LatencyBucket = {
+  label: string;
+  count: number;
+  percent: number;
 };
 
 type ResultStats = {
@@ -50,6 +57,8 @@ type ResultStats = {
   slowest: desktop.TraceDTO | null;
   errorGroups: ResultGroup[];
   statusGroups: ResultGroup[];
+  latencyBuckets: LatencyBucket[];
+  slowestTraces: desktop.TraceDTO[];
 };
 
 const defaultRequest: RequestConfig = {
@@ -473,6 +482,12 @@ function ResultsWorkbench(props: {
         <GroupSummary title={props.t("results.statusGroups")} groups={props.resultStats.statusGroups} t={props.t} />
       </section>
 
+      <section className="visual-strip">
+        <LatencyDistribution title={props.t("results.latencyDistribution")} buckets={props.resultStats.latencyBuckets} t={props.t} />
+        <StatusDistribution title={props.t("results.statusDistribution")} groups={props.resultStats.statusGroups} t={props.t} />
+        <SlowRequests title={props.t("results.slowestRequests")} traces={props.resultStats.slowestTraces} t={props.t} />
+      </section>
+
       <section className="trace-work-area">
         <div className="trace-table-panel">
           <div className="trace-toolbar">
@@ -552,6 +567,69 @@ function GroupSummary(props: { title: string; groups: ResultGroup[]; t: (key: I1
             <strong>{group.count}</strong>
           </div>
         ))
+      )}
+    </div>
+  );
+}
+
+function LatencyDistribution(props: { title: string; buckets: LatencyBucket[]; t: (key: I18nKey) => string }) {
+  return (
+    <div className="distribution-panel">
+      <div className="trace-heading">{props.title}</div>
+      {props.buckets.every((bucket) => bucket.count === 0) ? (
+        <div className="trace-empty">{props.t("results.none")}</div>
+      ) : (
+        <div className="bar-list">
+          {props.buckets.map((bucket) => (
+            <div className="bar-row" key={bucket.label}>
+              <span>{bucket.label}</span>
+              <div className="bar-track"><div className="bar-fill" style={{ width: `${bucket.percent}%` }} /></div>
+              <strong>{bucket.count}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatusDistribution(props: { title: string; groups: ResultGroup[]; t: (key: I18nKey) => string }) {
+  return (
+    <div className="distribution-panel">
+      <div className="trace-heading">{props.title}</div>
+      {props.groups.length === 0 ? (
+        <div className="trace-empty">{props.t("results.none")}</div>
+      ) : (
+        <div className="bar-list">
+          {props.groups.slice(0, 6).map((group) => (
+            <div className="bar-row" key={group.label}>
+              <span>{group.label}</span>
+              <div className="bar-track"><div className="bar-fill status" style={{ width: `${group.percent ?? 0}%` }} /></div>
+              <strong>{(group.percent ?? 0).toFixed(0)}%</strong>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SlowRequests(props: { title: string; traces: desktop.TraceDTO[]; t: (key: I18nKey) => string }) {
+  return (
+    <div className="distribution-panel">
+      <div className="trace-heading">{props.title}</div>
+      {props.traces.length === 0 ? (
+        <div className="trace-empty">{props.t("results.none")}</div>
+      ) : (
+        <div className="slow-list">
+          {props.traces.map((trace) => (
+            <div className="slow-row" key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}`}>
+              <span>T{trace.threadId} L{trace.loopIndex}</span>
+              <strong>{trace.responseTimeMs}ms</strong>
+              <em>{trace.url}</em>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -709,7 +787,9 @@ function buildResultStats(traces: desktop.TraceDTO[]): ResultStats {
     failureRate: traces.length === 0 ? 0 : (failed / traces.length) * 100,
     slowest,
     errorGroups: groupTraces(traces.filter((trace) => !trace.success), (trace) => trace.error || `HTTP ${trace.responseStatus || "ERR"}`),
-    statusGroups: groupTraces(traces, (trace) => String(trace.responseStatus || "ERR"))
+    statusGroups: groupTraces(traces, (trace) => String(trace.responseStatus || "ERR")),
+    latencyBuckets: buildLatencyBuckets(traces),
+    slowestTraces: [...traces].sort((a, b) => b.responseTimeMs - a.responseTimeMs).slice(0, 5)
   };
 }
 
@@ -731,8 +811,30 @@ function groupTraces(traces: desktop.TraceDTO[], labelForTrace: (trace: desktop.
     counts.set(label, (counts.get(label) ?? 0) + 1);
   });
   return Array.from(counts.entries())
-    .map(([label, count]) => ({ label, count }))
+    .map(([label, count]) => ({ label, count, percent: traces.length === 0 ? 0 : (count / traces.length) * 100 }))
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+function buildLatencyBuckets(traces: desktop.TraceDTO[]) {
+  const buckets = [
+    { label: "0-50ms", max: 50, count: 0 },
+    { label: "51-100ms", max: 100, count: 0 },
+    { label: "101-300ms", max: 300, count: 0 },
+    { label: "301-1000ms", max: 1000, count: 0 },
+    { label: ">1000ms", max: Number.POSITIVE_INFINITY, count: 0 }
+  ];
+  traces.forEach((trace) => {
+    const bucket = buckets.find((item) => trace.responseTimeMs <= item.max);
+    if (bucket) {
+      bucket.count++;
+    }
+  });
+  const total = traces.length;
+  return buckets.map((bucket) => ({
+    label: bucket.label,
+    count: bucket.count,
+    percent: total === 0 ? 0 : (bucket.count / total) * 100
+  }));
 }
 
 function formatHeaders(headers?: Record<string, string>) {
