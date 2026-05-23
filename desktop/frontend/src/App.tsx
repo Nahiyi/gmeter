@@ -1,6 +1,7 @@
-import { ChangeEvent, useMemo, useRef, useState } from "react";
-import { StartRun, ValidatePlan } from "../wailsjs/go/desktop/App";
-import { engine, reporter } from "../wailsjs/go/models";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/desktop/App";
+import { desktop, engine } from "../wailsjs/go/models";
+import { EventsOn } from "../wailsjs/runtime/runtime";
 
 const sampleConfig = `{
   "request": {
@@ -37,6 +38,10 @@ type GmeterConfig = {
   users?: UserConfig[];
 };
 
+type RunEvent = {
+  trace?: desktop.TraceDTO;
+};
+
 function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [threads, setThreads] = useState(10);
@@ -44,11 +49,33 @@ function App() {
   const [loops, setLoops] = useState(1);
   const [requestTimeoutMs, setRequestTimeoutMs] = useState(5000);
   const [configText, setConfigText] = useState(sampleConfig);
-  const [summary, setSummary] = useState<reporter.Summary | null>(null);
+  const [snapshot, setSnapshot] = useState<desktop.RunSnapshot | null>(null);
   const [status, setStatus] = useState("Idle");
   const [consoleLines, setConsoleLines] = useState<string[]>([
     "Ready. Load or edit a GMeter JSON config, then run."
   ]);
+
+  useEffect(() => {
+    GetRunSnapshot().then((nextSnapshot) => setSnapshot(nextSnapshot));
+    const offSnapshot = EventsOn("gmeter:run:snapshot", (nextSnapshot: desktop.RunSnapshot) => {
+      setSnapshot(nextSnapshot);
+      setStatus(statusLabel(nextSnapshot.status));
+    });
+    const offEvent = EventsOn("gmeter:run:event", (event: RunEvent) => {
+      if (event.trace) {
+        const trace = event.trace;
+        appendConsole(`Trace T${trace.threadId} L${trace.loopIndex}: HTTP ${trace.responseStatus} in ${trace.responseTimeMs}ms`);
+      }
+    });
+    return () => {
+      offSnapshot();
+      offEvent();
+    };
+  }, []);
+
+  const summary = snapshot?.summary;
+  const recentTraces = snapshot?.recentTraces ?? [];
+  const isRunning = snapshot?.status === "running";
 
   const metrics = useMemo(
     () => [
@@ -104,13 +131,20 @@ function App() {
         return;
       }
 
-      const result = await StartRun(plan, runOptions());
-      setSummary(result.Report.summary);
-      setStatus("Complete");
-      appendConsole(`Run complete: ${result.Report.summary.totalRequests} requests, ${(result.Report.summary.successRate * 100).toFixed(1)}% success.`);
+      const runID = await StartRun(plan, runOptions());
+      appendConsole(`Run started: ${runID}`);
     } catch (error) {
       setStatus("Failed");
       appendConsole(`Run failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  async function handleStop() {
+    try {
+      await StopRun();
+      appendConsole("Stop requested.");
+    } catch (error) {
+      appendConsole(`Stop failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -152,9 +186,15 @@ function App() {
           <input ref={fileInputRef} className="file-input" type="file" accept=".json,application/json" onChange={handleOpenFile} />
           <button type="button" onClick={handleOpenClick}>Open</button>
           <button type="button" onClick={handleSave}>Save</button>
-          <button type="button" className="primary" onClick={handleRun}>
-            Run
-          </button>
+          {isRunning ? (
+            <button type="button" className="danger" onClick={handleStop}>
+              Stop
+            </button>
+          ) : (
+            <button type="button" className="primary" onClick={handleRun}>
+              Run
+            </button>
+          )}
         </div>
       </header>
 
@@ -218,10 +258,38 @@ function App() {
               </div>
             ))}
           </div>
+          <div className="trace-list">
+            <div className="trace-heading">Recent Traces</div>
+            {recentTraces.length === 0 ? (
+              <div className="trace-empty">No request traces yet.</div>
+            ) : (
+              recentTraces.slice(0, 8).map((trace, index) => (
+                <div className="trace-row" key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
+                  <span>T{trace.threadId} / L{trace.loopIndex}</span>
+                  <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
+                  <span>{trace.responseTimeMs}ms</span>
+                </div>
+              ))
+            )}
+          </div>
         </aside>
       </section>
     </main>
   );
+}
+
+function statusLabel(status?: string) {
+  switch (status) {
+    case "running":
+      return "Running";
+    case "completed":
+      return "Complete";
+    case "canceled":
+      return "Canceled";
+    case "idle":
+    default:
+      return "Idle";
+  }
 }
 
 export default App;

@@ -6,6 +6,10 @@ export function ExportLastReport(arg1) {
   return window['go']['desktop']['App']['ExportLastReport'](arg1);
 }
 
+export function GetRunSnapshot() {
+  return window['go']['desktop']['App']['GetRunSnapshot']();
+}
+
 export function StartRun(arg1, arg2) {
   return window['go']['desktop']['App']['StartRun'](arg1, arg2);
 }
