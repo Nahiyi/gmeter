@@ -27,6 +27,7 @@ body,
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -146,7 +147,8 @@ label {
   font-size: 12px;
 }
 
-input {
+input,
+select {
   width: 100%;
   height: 32px;
   border: 1px solid #c5cbd2;
@@ -175,6 +177,7 @@ input {
 .editor-panel {
   display: grid;
   grid-template-rows: auto 1fr;
+  overflow: hidden;
 }
 
 textarea {
@@ -189,6 +192,101 @@ textarea {
   font-family: Consolas, "Cascadia Mono", monospace;
   font-size: 13px;
   line-height: 1.5;
+}
+
+.request-form {
+  display: grid;
+  grid-template-rows: auto auto minmax(130px, 0.7fr) auto minmax(160px, 1fr);
+  gap: 12px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.request-line {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+}
+
+.subheading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  color: #394350;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.subheading button,
+.user-title button,
+.header-grid button {
+  height: 26px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.table-editor,
+.users-editor,
+.user-block {
+  min-width: 0;
+}
+
+.header-grid {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(160px, 1fr) 52px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.header-grid input {
+  height: 28px;
+}
+
+.header-grid-head {
+  margin-bottom: 4px;
+  color: #6a737f;
+  font-size: 11px;
+}
+
+.body-editor,
+.json-preview {
+  min-height: 0;
+}
+
+.body-editor textarea,
+.json-preview textarea {
+  min-height: 120px;
+}
+
+.json-preview textarea {
+  background: #fbfcfd;
+  color: #46505d;
+}
+
+.users-editor {
+  border-top: 1px solid #dde1e5;
+  padding-top: 10px;
+}
+
+.user-block {
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 9px;
+  margin-bottom: 8px;
+}
+
+.user-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #4b5663;
+  font-size: 12px;
+  font-weight: 650;
 }
 
 .results-panel {
