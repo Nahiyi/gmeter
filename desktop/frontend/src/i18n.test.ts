@@ -10,3 +10,14 @@ describe("result workbench labels", () => {
     assert.match(translate("zh", "results.mode"), /样本/);
   });
 });
+
+describe("titlebar command labels", () => {
+  it("provides desktop menu and icon button labels", () => {
+    assert.equal(translate("en", "command.menu"), "Menu");
+    assert.equal(translate("zh", "command.menu"), "菜单");
+    assert.equal(translate("en", "command.startRun"), "Start run");
+    assert.equal(translate("zh", "command.startRun"), "开始运行");
+    assert.equal(translate("en", "command.stopRun"), "Stop run");
+    assert.equal(translate("zh", "command.stopRun"), "停止运行");
+  });
+});

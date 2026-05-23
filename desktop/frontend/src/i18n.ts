@@ -7,6 +7,10 @@ export type I18nKey =
   | "command.save"
   | "command.run"
   | "command.stop"
+  | "command.menu"
+  | "command.language"
+  | "command.startRun"
+  | "command.stopRun"
   | "command.add"
   | "command.delete"
   | "command.addUser"
@@ -123,6 +127,10 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.save": "Save",
     "command.run": "Run",
     "command.stop": "Stop",
+    "command.menu": "Menu",
+    "command.language": "Language",
+    "command.startRun": "Start run",
+    "command.stopRun": "Stop run",
     "command.add": "Add",
     "command.delete": "Del",
     "command.addUser": "Add User",
@@ -238,6 +246,10 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.save": "保存",
     "command.run": "运行",
     "command.stop": "停止",
+    "command.menu": "菜单",
+    "command.language": "语言",
+    "command.startRun": "开始运行",
+    "command.stopRun": "停止运行",
     "command.add": "添加",
     "command.delete": "删除",
     "command.addUser": "添加用户",

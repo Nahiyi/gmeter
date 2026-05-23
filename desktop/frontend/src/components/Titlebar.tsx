@@ -1,4 +1,4 @@
-import { ChangeEvent, RefObject } from "react";
+import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import type { I18nKey, Locale } from "../i18n";
 
 export function Titlebar(props: {
@@ -13,24 +13,81 @@ export function Titlebar(props: {
   onStop: () => void;
   t: (key: I18nKey) => string;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function closeOnOutsideClick(event: MouseEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("mousedown", closeOnOutsideClick);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("mousedown", closeOnOutsideClick);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [menuOpen]);
+
+  function closeAfter(action: () => void) {
+    action();
+    setMenuOpen(false);
+  }
+
   return (
     <header className="titlebar">
-      <div>
-        <strong>{props.t("app.title")}</strong>
-        <span>{props.t("app.subtitle")}</span>
+      <div className="titlebar-left">
+        <input ref={props.fileInputRef} className="file-input" type="file" accept=".json,application/json" onChange={props.onOpenFile} />
+        <div className="app-menu" ref={menuRef}>
+          <button
+            type="button"
+            className="menu-trigger"
+            aria-expanded={menuOpen}
+            aria-label={props.t("command.menu")}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span className="icon menu-icon" aria-hidden="true" />
+          </button>
+          {menuOpen ? (
+            <div className="app-menu-popover" role="menu">
+              <button type="button" role="menuitem" onClick={() => closeAfter(props.onOpenClick)}>
+                <span>{props.t("command.open")}</span>
+              </button>
+              <button type="button" role="menuitem" onClick={() => closeAfter(props.onSave)}>
+                <span>{props.t("command.save")}</span>
+              </button>
+              <div className="menu-separator" />
+              <label className="menu-select-row">
+                <span>{props.t("command.language")}</span>
+                <select value={props.locale} onChange={(event) => props.onLocaleChange(event.target.value as Locale)}>
+                  <option value="en">EN</option>
+                  <option value="zh">中文</option>
+                </select>
+              </label>
+            </div>
+          ) : null}
+        </div>
+        <div className="titlebar-brand">
+          <strong>{props.t("app.title")}</strong>
+          <span>{props.t("app.subtitle")}</span>
+        </div>
       </div>
       <div className="titlebar-actions">
-        <input ref={props.fileInputRef} className="file-input" type="file" accept=".json,application/json" onChange={props.onOpenFile} />
-        <select className="locale-select" value={props.locale} onChange={(event) => props.onLocaleChange(event.target.value as Locale)}>
-          <option value="en">EN</option>
-          <option value="zh">中文</option>
-        </select>
-        <button type="button" onClick={props.onOpenClick}>{props.t("command.open")}</button>
-        <button type="button" onClick={props.onSave}>{props.t("command.save")}</button>
         {props.isRunning ? (
-          <button type="button" className="danger" onClick={props.onStop}>{props.t("command.stop")}</button>
+          <button type="button" className="icon-command danger" aria-label={props.t("command.stopRun")} title={props.t("command.stopRun")} onClick={props.onStop}>
+            <span className="icon stop-icon" aria-hidden="true" />
+          </button>
         ) : (
-          <button type="button" className="primary" onClick={props.onRun}>{props.t("command.run")}</button>
+          <button type="button" className="icon-command primary" aria-label={props.t("command.startRun")} title={props.t("command.startRun")} onClick={props.onRun}>
+            <span className="icon run-icon" aria-hidden="true" />
+          </button>
         )}
       </div>
     </header>
