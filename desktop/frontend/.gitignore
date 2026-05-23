@@ -1,8 +1,6 @@
 node_modules/
+dist/
 .test-build/
-dist/*
-!dist/
-!dist/.keep
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
