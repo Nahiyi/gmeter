@@ -109,10 +109,12 @@ button.danger {
 }
 
 .panel-heading {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
   min-height: 30px;
   margin-bottom: 14px;
 }
@@ -133,20 +135,24 @@ button.danger {
   font-size: 12px;
 }
 
-.heading-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex: 0 1 360px;
-  min-width: 218px;
-  gap: 10px;
+.workbench-heading {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  padding-right: 116px;
 }
 
-.heading-actions > span {
+.workbench-mode {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: right;
+}
+
+.workbench-heading .segmented-control {
+  position: absolute;
+  top: 1px;
+  right: 0;
 }
 
 .segmented-control,
@@ -236,6 +242,10 @@ select {
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
+}
+
+.editor-panel > * {
+  min-width: 0;
 }
 
 textarea {
@@ -409,21 +419,32 @@ textarea {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .results-kpis {
   display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .result-kpi {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   min-height: 58px;
   border: 1px solid #d3d8de;
   border-radius: 4px;
   background: #ffffff;
   padding: 9px 10px;
+  overflow: hidden;
 }
 
 .result-kpi span {
@@ -445,12 +466,17 @@ textarea {
 
 .analysis-strip {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
   min-height: 104px;
+  min-width: 0;
 }
 
 .group-summary {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   border: 1px solid #c5cbd2;
   border-radius: 4px;
@@ -480,13 +506,19 @@ textarea {
 
 .trace-work-area {
   display: grid;
-  grid-template-columns: minmax(430px, 1.35fr) minmax(300px, 0.9fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
   gap: 10px;
+  width: 100%;
+  max-width: 100%;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .trace-table-panel,
 .trace-inspector {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   min-height: 0;
   border: 1px solid #c5cbd2;

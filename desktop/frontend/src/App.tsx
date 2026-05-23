@@ -302,14 +302,12 @@ function App() {
         </aside>
 
         <section className="panel editor-panel" aria-label="Request configuration">
-          <div className="panel-heading">
+          <div className="panel-heading workbench-heading">
             <h2>{workbenchView === "config" ? t("request.profile") : t("results.workbench")}</h2>
-            <div className="heading-actions">
-              <span>{workbenchView === "config" ? t("request.profileMode") : t("results.mode")}</span>
-              <div className="segmented-control" role="tablist">
-                <button type="button" className={workbenchView === "config" ? "active" : ""} onClick={() => setWorkbenchView("config")}>{t("view.config")}</button>
-                <button type="button" className={workbenchView === "results" ? "active" : ""} onClick={() => setWorkbenchView("results")}>{t("view.results")}</button>
-              </div>
+            <span className="workbench-mode">{workbenchView === "config" ? t("request.profileMode") : t("results.mode")}</span>
+            <div className="segmented-control" role="tablist">
+              <button type="button" className={workbenchView === "config" ? "active" : ""} onClick={() => setWorkbenchView("config")}>{t("view.config")}</button>
+              <button type="button" className={workbenchView === "results" ? "active" : ""} onClick={() => setWorkbenchView("results")}>{t("view.results")}</button>
             </div>
           </div>
 
