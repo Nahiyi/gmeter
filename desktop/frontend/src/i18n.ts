@@ -48,6 +48,38 @@ export type I18nKey =
   | "trace.consoleHTTP"
   | "trace.consoleIn"
   | "request.noUserHeaders"
+  | "view.config"
+  | "view.results"
+  | "results.workbench"
+  | "results.mode"
+  | "results.empty"
+  | "results.traceTable"
+  | "results.traceInspector"
+  | "results.failureGroups"
+  | "results.statusGroups"
+  | "results.totalTraces"
+  | "results.failedTraces"
+  | "results.slowest"
+  | "results.failureRate"
+  | "results.filter"
+  | "results.filterAll"
+  | "results.filterFailed"
+  | "results.filterSuccess"
+  | "results.search"
+  | "results.allStatuses"
+  | "results.thread"
+  | "results.loop"
+  | "results.request"
+  | "results.method"
+  | "results.url"
+  | "results.latency"
+  | "results.noMatches"
+  | "results.requestEvidence"
+  | "results.responseEvidence"
+  | "results.headers"
+  | "results.body"
+  | "results.errorSummary"
+  | "results.none"
   | "console.ready"
   | "console.starting"
   | "console.loaded"
@@ -114,6 +146,38 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "trace.consoleHTTP": "HTTP",
     "trace.consoleIn": "in",
     "request.noUserHeaders": "No user headers. Requests will use shared headers only.",
+    "view.config": "Config",
+    "view.results": "Results",
+    "results.workbench": "Results Workbench",
+    "results.mode": "trace table + detail",
+    "results.empty": "Run a load test to populate the result workbench.",
+    "results.traceTable": "Trace Table",
+    "results.traceInspector": "Trace Inspector",
+    "results.failureGroups": "Failure Groups",
+    "results.statusGroups": "Status Codes",
+    "results.totalTraces": "Traces",
+    "results.failedTraces": "Failed",
+    "results.slowest": "Slowest",
+    "results.failureRate": "Failure Rate",
+    "results.filter": "Filter",
+    "results.filterAll": "All",
+    "results.filterFailed": "Failed",
+    "results.filterSuccess": "Success",
+    "results.search": "Search URL or error",
+    "results.allStatuses": "All statuses",
+    "results.thread": "Thread",
+    "results.loop": "Loop",
+    "results.request": "Request",
+    "results.method": "Method",
+    "results.url": "URL",
+    "results.latency": "Latency",
+    "results.noMatches": "No traces match the current filters.",
+    "results.requestEvidence": "Request Evidence",
+    "results.responseEvidence": "Response Evidence",
+    "results.headers": "Headers",
+    "results.body": "Body",
+    "results.errorSummary": "Error Summary",
+    "results.none": "None",
     "console.ready": "Ready. Configure a GMeter load profile, then run.",
     "console.starting": "Starting run...",
     "console.loaded": "Loaded config",
@@ -179,6 +243,38 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "trace.consoleHTTP": "HTTP",
     "trace.consoleIn": "耗时",
     "request.noUserHeaders": "暂无用户请求头，将仅使用公共请求头。",
+    "view.config": "配置",
+    "view.results": "结果",
+    "results.workbench": "结果工作台",
+    "results.mode": "请求表格 + 详情",
+    "results.empty": "运行一次压测后，这里会显示结果分析。",
+    "results.traceTable": "请求表格",
+    "results.traceInspector": "请求检查器",
+    "results.failureGroups": "失败分组",
+    "results.statusGroups": "状态码",
+    "results.totalTraces": "请求记录",
+    "results.failedTraces": "失败",
+    "results.slowest": "最慢",
+    "results.failureRate": "失败率",
+    "results.filter": "筛选",
+    "results.filterAll": "全部",
+    "results.filterFailed": "失败",
+    "results.filterSuccess": "成功",
+    "results.search": "搜索 URL 或错误",
+    "results.allStatuses": "全部状态",
+    "results.thread": "线程",
+    "results.loop": "循环",
+    "results.request": "请求",
+    "results.method": "方法",
+    "results.url": "URL",
+    "results.latency": "耗时",
+    "results.noMatches": "没有符合当前筛选条件的请求记录。",
+    "results.requestEvidence": "请求证据",
+    "results.responseEvidence": "响应证据",
+    "results.headers": "请求头",
+    "results.body": "请求体",
+    "results.errorSummary": "错误摘要",
+    "results.none": "无",
     "console.ready": "就绪。配置 GMeter 压测计划后运行。",
     "console.starting": "开始运行...",
     "console.loaded": "已加载配置",

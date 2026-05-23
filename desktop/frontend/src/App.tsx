@@ -35,6 +35,23 @@ type RunEvent = {
   trace?: desktop.TraceDTO;
 };
 
+type WorkbenchView = "config" | "results";
+type TraceFilter = "all" | "failed" | "success";
+
+type ResultGroup = {
+  label: string;
+  count: number;
+};
+
+type ResultStats = {
+  total: number;
+  failed: number;
+  failureRate: number;
+  slowest: desktop.TraceDTO | null;
+  errorGroups: ResultGroup[];
+  statusGroups: ResultGroup[];
+};
+
 const defaultRequest: RequestConfig = {
   url: "https://example.com/api",
   method: "POST",
@@ -69,6 +86,10 @@ function App() {
   const [statusKey, setStatusKey] = useState<I18nKey>("status.idle");
   const [locale, setLocale] = useState<Locale>(getSavedLocale);
   const [selectedTrace, setSelectedTrace] = useState<desktop.TraceDTO | null>(null);
+  const [workbenchView, setWorkbenchView] = useState<WorkbenchView>("config");
+  const [traceFilter, setTraceFilter] = useState<TraceFilter>("all");
+  const [traceSearch, setTraceSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [consoleLines, setConsoleLines] = useState<string[]>([
     translate(getSavedLocale(), "console.ready")
   ]);
@@ -112,6 +133,15 @@ function App() {
   const summary = snapshot?.summary;
   const recentTraces = snapshot?.recentTraces ?? [];
   const isRunning = snapshot?.status === "running";
+  const resultStats = useMemo(() => buildResultStats(recentTraces), [recentTraces]);
+  const statusOptions = useMemo(() => {
+    const statuses = new Set(recentTraces.map((trace) => String(trace.responseStatus || "ERR")));
+    return Array.from(statuses).sort((a, b) => a.localeCompare(b));
+  }, [recentTraces]);
+  const filteredTraces = useMemo(
+    () => filterTraces(recentTraces, traceFilter, traceSearch, statusFilter),
+    [recentTraces, statusFilter, traceFilter, traceSearch]
+  );
 
   const metrics = useMemo(
     () => [
@@ -167,6 +197,7 @@ function App() {
       }
 
       const runID = await StartRun(plan, runOptions());
+      setWorkbenchView("results");
       appendConsole(`${t("console.runStarted")}: ${runID}`);
     } catch (error) {
       setStatusKey("status.failed");
@@ -272,40 +303,48 @@ function App() {
 
         <section className="panel editor-panel" aria-label="Request configuration">
           <div className="panel-heading">
-            <h2>{t("request.profile")}</h2>
-            <span>{t("request.profileMode")}</span>
-          </div>
-
-          <div className="request-form">
-            <div className="request-line">
-              <label>
-                {t("request.method")}
-                <select value={method} onChange={(event) => setMethod(event.target.value)}>
-                  {["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].map((item) => (
-                    <option key={item} value={item}>{item}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                {t("request.url")}
-                <input value={url} onChange={(event) => setURL(event.target.value)} />
-              </label>
+            <h2>{workbenchView === "config" ? t("request.profile") : t("results.workbench")}</h2>
+            <div className="heading-actions">
+              <span>{workbenchView === "config" ? t("request.profileMode") : t("results.mode")}</span>
+              <div className="segmented-control" role="tablist">
+                <button type="button" className={workbenchView === "config" ? "active" : ""} onClick={() => setWorkbenchView("config")}>{t("view.config")}</button>
+                <button type="button" className={workbenchView === "results" ? "active" : ""} onClick={() => setWorkbenchView("results")}>{t("view.results")}</button>
+              </div>
             </div>
-
-            <HeaderEditor title={t("request.headers")} addLabel={t("command.add")} deleteLabel={t("command.delete")} keyLabel={t("table.key")} valueLabel={t("table.value")} rows={requestHeaders} onChange={setRequestHeaders} />
-
-            <label className="body-editor">
-              {t("request.body")}
-              <textarea spellCheck="false" value={body} onChange={(event) => setBody(event.target.value)} />
-            </label>
-
-            <UserEditor users={users} onChange={setUsers} t={t} />
-
-            <label className="json-preview">
-              {t("request.jsonPreview")}
-              <textarea spellCheck="false" readOnly value={configText} />
-            </label>
           </div>
+
+          {workbenchView === "config" ? (
+            <ConfigEditor
+              body={body}
+              configText={configText}
+              method={method}
+              requestHeaders={requestHeaders}
+              setBody={setBody}
+              setMethod={setMethod}
+              setRequestHeaders={setRequestHeaders}
+              setURL={setURL}
+              setUsers={setUsers}
+              t={t}
+              url={url}
+              users={users}
+            />
+          ) : (
+            <ResultsWorkbench
+              filteredTraces={filteredTraces}
+              recentTraces={recentTraces}
+              resultStats={resultStats}
+              selectedTrace={selectedTrace}
+              setSelectedTrace={setSelectedTrace}
+              setStatusFilter={setStatusFilter}
+              setTraceFilter={setTraceFilter}
+              setTraceSearch={setTraceSearch}
+              statusFilter={statusFilter}
+              statusOptions={statusOptions}
+              t={t}
+              traceFilter={traceFilter}
+              traceSearch={traceSearch}
+            />
+          )}
         </section>
 
         <aside className="panel results-panel" aria-label="Run results">
@@ -344,7 +383,6 @@ function App() {
               ))
             )}
           </div>
-          <TraceDetail trace={selectedTrace} t={t} />
         </aside>
       </section>
     </main>
@@ -357,6 +395,212 @@ function NumberField(props: { label: string; min: number; value: number; onChang
       {props.label}
       <input type="number" min={props.min} value={props.value} onChange={(event) => props.onChange(Number(event.target.value))} />
     </label>
+  );
+}
+
+function ConfigEditor(props: {
+  body: string;
+  configText: string;
+  method: string;
+  requestHeaders: HeaderRow[];
+  setBody: (body: string) => void;
+  setMethod: (method: string) => void;
+  setRequestHeaders: (rows: HeaderRow[]) => void;
+  setURL: (url: string) => void;
+  setUsers: (users: UserRow[]) => void;
+  t: (key: I18nKey) => string;
+  url: string;
+  users: UserRow[];
+}) {
+  return (
+    <div className="request-form">
+      <div className="request-line">
+        <label>
+          {props.t("request.method")}
+          <select value={props.method} onChange={(event) => props.setMethod(event.target.value)}>
+            {["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          {props.t("request.url")}
+          <input value={props.url} onChange={(event) => props.setURL(event.target.value)} />
+        </label>
+      </div>
+
+      <HeaderEditor title={props.t("request.headers")} addLabel={props.t("command.add")} deleteLabel={props.t("command.delete")} keyLabel={props.t("table.key")} valueLabel={props.t("table.value")} rows={props.requestHeaders} onChange={props.setRequestHeaders} />
+
+      <label className="body-editor">
+        {props.t("request.body")}
+        <textarea spellCheck="false" value={props.body} onChange={(event) => props.setBody(event.target.value)} />
+      </label>
+
+      <UserEditor users={props.users} onChange={props.setUsers} t={props.t} />
+
+      <label className="json-preview">
+        {props.t("request.jsonPreview")}
+        <textarea spellCheck="false" readOnly value={props.configText} />
+      </label>
+    </div>
+  );
+}
+
+function ResultsWorkbench(props: {
+  filteredTraces: desktop.TraceDTO[];
+  recentTraces: desktop.TraceDTO[];
+  resultStats: ResultStats;
+  selectedTrace: desktop.TraceDTO | null;
+  setSelectedTrace: (trace: desktop.TraceDTO) => void;
+  setStatusFilter: (status: string) => void;
+  setTraceFilter: (filter: TraceFilter) => void;
+  setTraceSearch: (search: string) => void;
+  statusFilter: string;
+  statusOptions: string[];
+  t: (key: I18nKey) => string;
+  traceFilter: TraceFilter;
+  traceSearch: string;
+}) {
+  return (
+    <div className="results-workbench">
+      <div className="results-kpis">
+        <ResultKPI label={props.t("results.totalTraces")} value={String(props.resultStats.total)} />
+        <ResultKPI label={props.t("results.failedTraces")} value={String(props.resultStats.failed)} tone={props.resultStats.failed > 0 ? "bad" : undefined} />
+        <ResultKPI label={props.t("results.slowest")} value={props.resultStats.slowest ? `${props.resultStats.slowest.responseTimeMs} ms` : "-- ms"} />
+        <ResultKPI label={props.t("results.failureRate")} value={`${props.resultStats.failureRate.toFixed(1)}%`} tone={props.resultStats.failureRate > 0 ? "bad" : undefined} />
+      </div>
+
+      <section className="analysis-strip">
+        <GroupSummary title={props.t("results.failureGroups")} groups={props.resultStats.errorGroups} t={props.t} />
+        <GroupSummary title={props.t("results.statusGroups")} groups={props.resultStats.statusGroups} t={props.t} />
+      </section>
+
+      <section className="trace-work-area">
+        <div className="trace-table-panel">
+          <div className="trace-toolbar">
+            <div className="filter-group" aria-label={props.t("results.filter")}>
+              {(["all", "failed", "success"] as TraceFilter[]).map((filter) => (
+                <button key={filter} type="button" className={props.traceFilter === filter ? "active" : ""} onClick={() => props.setTraceFilter(filter)}>
+                  {props.t(filter === "all" ? "results.filterAll" : filter === "failed" ? "results.filterFailed" : "results.filterSuccess")}
+                </button>
+              ))}
+            </div>
+            <input className="trace-search" value={props.traceSearch} placeholder={props.t("results.search")} onChange={(event) => props.setTraceSearch(event.target.value)} />
+            <select className="status-filter" value={props.statusFilter} onChange={(event) => props.setStatusFilter(event.target.value)}>
+              <option value="all">{props.t("results.allStatuses")}</option>
+              {props.statusOptions.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="trace-table" role="table" aria-label={props.t("results.traceTable")}>
+            <div className="trace-table-row trace-table-head" role="row">
+              <span>{props.t("results.thread")}</span>
+              <span>{props.t("results.loop")}</span>
+              <span>{props.t("results.method")}</span>
+              <span>{props.t("trace.status")}</span>
+              <span>{props.t("results.latency")}</span>
+              <span>{props.t("results.url")}</span>
+            </div>
+            {props.filteredTraces.length === 0 ? (
+              <div className="trace-empty">{props.recentTraces.length === 0 ? props.t("results.empty") : props.t("results.noMatches")}</div>
+            ) : (
+              props.filteredTraces.map((trace, index) => (
+                <button
+                  className={`trace-table-row ${trace.success ? "" : "failed"} ${props.selectedTrace === trace ? "selected" : ""}`}
+                  key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}
+                  onClick={() => props.setSelectedTrace(trace)}
+                  role="row"
+                  type="button"
+                >
+                  <span>T{trace.threadId}</span>
+                  <span>L{trace.loopIndex}</span>
+                  <span>{trace.method}</span>
+                  <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
+                  <span>{trace.responseTimeMs}ms</span>
+                  <span className="url-cell">{trace.url}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        <TraceInspector trace={props.selectedTrace} t={props.t} />
+      </section>
+    </div>
+  );
+}
+
+function ResultKPI(props: { label: string; value: string; tone?: "bad" }) {
+  return (
+    <div className={`result-kpi ${props.tone ?? ""}`}>
+      <span>{props.label}</span>
+      <strong>{props.value}</strong>
+    </div>
+  );
+}
+
+function GroupSummary(props: { title: string; groups: ResultGroup[]; t: (key: I18nKey) => string }) {
+  return (
+    <div className="group-summary">
+      <div className="trace-heading">{props.title}</div>
+      {props.groups.length === 0 ? (
+        <div className="trace-empty">{props.t("results.none")}</div>
+      ) : (
+        props.groups.slice(0, 5).map((group) => (
+          <div className="group-row" key={group.label}>
+            <span>{group.label}</span>
+            <strong>{group.count}</strong>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKey) => string }) {
+  if (!props.trace) {
+    return (
+      <section className="trace-inspector">
+        <div className="trace-heading">{props.t("results.traceInspector")}</div>
+        <div className="trace-empty">{props.t("trace.noSelection")}</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="trace-inspector">
+      <div className="trace-heading">{props.t("results.traceInspector")}</div>
+      <div className="inspector-grid">
+        <span>{props.t("results.thread")}</span>
+        <strong>T{props.trace.threadId}</strong>
+        <span>{props.t("results.loop")}</span>
+        <strong>L{props.trace.loopIndex}</strong>
+        <span>{props.t("results.request")}</span>
+        <strong>#{props.trace.requestIndex}</strong>
+        <span>{props.t("trace.status")}</span>
+        <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
+        <span>{props.t("results.latency")}</span>
+        <strong>{props.trace.responseTimeMs}ms</strong>
+      </div>
+      <div className="evidence-block">
+        <div className="trace-heading small">{props.t("results.requestEvidence")}</div>
+        <div className="evidence-line"><span>{props.t("results.method")}</span><strong>{props.trace.method}</strong></div>
+        <div className="evidence-line"><span>{props.t("results.url")}</span><strong>{props.trace.url}</strong></div>
+        <pre className="detail-pre">{formatHeaders(props.trace.requestHeaders)}</pre>
+      </div>
+      {props.trace.error ? (
+        <div className="evidence-block">
+          <div className="trace-heading small">{props.t("results.errorSummary")}</div>
+          <pre className="detail-pre bad">{props.trace.error}</pre>
+        </div>
+      ) : null}
+      <div className="evidence-block">
+        <div className="trace-heading small">{props.t("results.responseEvidence")}</div>
+        <pre className="detail-pre">{props.trace.responseBody || props.t("trace.emptyBody")}</pre>
+      </div>
+    </section>
   );
 }
 
@@ -450,6 +694,54 @@ function headersFromRows(rows: HeaderRow[]) {
     }
     return headers;
   }, {});
+}
+
+function buildResultStats(traces: desktop.TraceDTO[]): ResultStats {
+  const failed = traces.filter((trace) => !trace.success).length;
+  const slowest = traces.reduce<desktop.TraceDTO | null>((current, trace) => {
+    if (!current || trace.responseTimeMs > current.responseTimeMs) {
+      return trace;
+    }
+    return current;
+  }, null);
+
+  return {
+    total: traces.length,
+    failed,
+    failureRate: traces.length === 0 ? 0 : (failed / traces.length) * 100,
+    slowest,
+    errorGroups: groupTraces(traces.filter((trace) => !trace.success), (trace) => trace.error || `HTTP ${trace.responseStatus || "ERR"}`),
+    statusGroups: groupTraces(traces, (trace) => String(trace.responseStatus || "ERR"))
+  };
+}
+
+function filterTraces(traces: desktop.TraceDTO[], filter: TraceFilter, search: string, status: string) {
+  const normalizedSearch = search.trim().toLowerCase();
+  return traces.filter((trace) => {
+    if (filter === "failed" && trace.success) return false;
+    if (filter === "success" && !trace.success) return false;
+    if (status !== "all" && String(trace.responseStatus || "ERR") !== status) return false;
+    if (!normalizedSearch) return true;
+    return trace.url.toLowerCase().includes(normalizedSearch) || trace.error.toLowerCase().includes(normalizedSearch);
+  });
+}
+
+function groupTraces(traces: desktop.TraceDTO[], labelForTrace: (trace: desktop.TraceDTO) => string) {
+  const counts = new Map<string, number>();
+  traces.forEach((trace) => {
+    const label = labelForTrace(trace);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  });
+  return Array.from(counts.entries())
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+function formatHeaders(headers?: Record<string, string>) {
+  if (!headers || Object.keys(headers).length === 0) {
+    return "{}";
+  }
+  return JSON.stringify(headers, null, 2);
 }
 
 function rowsFromHeaders(headers: Record<string, string>) {

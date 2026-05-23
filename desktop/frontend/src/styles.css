@@ -128,6 +128,43 @@ button.danger {
   font-size: 12px;
 }
 
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.segmented-control,
+.filter-group {
+  display: inline-flex;
+  border: 1px solid #b7bdc5;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.segmented-control button,
+.filter-group button {
+  height: 28px;
+  border: none;
+  border-right: 1px solid #c8cdd3;
+  border-radius: 0;
+  background: #ffffff;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.segmented-control button:last-child,
+.filter-group button:last-child {
+  border-right: none;
+}
+
+.segmented-control button.active,
+.filter-group button.active {
+  color: #ffffff;
+  background: #3d566d;
+}
+
 .status {
   border: 1px solid #b8c0c9;
   border-radius: 999px;
@@ -297,7 +334,7 @@ textarea {
 
 .results-panel {
   display: grid;
-  grid-template-rows: auto auto minmax(150px, 0.9fr) auto minmax(170px, 0.8fr);
+  grid-template-rows: auto auto minmax(170px, 1fr) auto;
   gap: 14px;
 }
 
@@ -350,6 +387,207 @@ textarea {
   border-radius: 4px;
   background: #ffffff;
   overflow: hidden;
+}
+
+.results-workbench {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+.results-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.result-kpi {
+  min-height: 58px;
+  border: 1px solid #d3d8de;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 9px 10px;
+}
+
+.result-kpi span {
+  display: block;
+  color: #6a737f;
+  font-size: 12px;
+}
+
+.result-kpi strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 19px;
+  font-weight: 650;
+}
+
+.result-kpi.bad strong {
+  color: #bd3838;
+}
+
+.analysis-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 104px;
+}
+
+.group-summary {
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.group-row {
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  gap: 8px;
+  border-bottom: 1px solid #edf0f3;
+  padding: 6px 10px;
+  color: #4b5663;
+  font-size: 12px;
+}
+
+.group-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-row strong {
+  text-align: right;
+}
+
+.trace-work-area {
+  display: grid;
+  grid-template-columns: minmax(430px, 1.35fr) minmax(300px, 0.9fr);
+  gap: 10px;
+  min-height: 0;
+}
+
+.trace-table-panel,
+.trace-inspector {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.trace-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) 130px;
+  gap: 8px;
+  border-bottom: 1px solid #dde1e5;
+  background: #f2f4f6;
+  padding: 8px;
+}
+
+.trace-search,
+.status-filter {
+  height: 28px;
+  font-size: 12px;
+}
+
+.trace-table {
+  height: calc(100% - 45px);
+  overflow: auto;
+}
+
+.trace-table-row {
+  display: grid;
+  grid-template-columns: 60px 54px 62px 70px 76px minmax(180px, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  border: none;
+  border-bottom: 1px solid #edf0f3;
+  border-radius: 0;
+  background: #ffffff;
+  padding: 0 10px;
+  color: #1d232a;
+  font-size: 12px;
+  text-align: left;
+}
+
+.trace-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-height: 30px;
+  background: #f8f9fa;
+  color: #68717c;
+  font-weight: 650;
+}
+
+button.trace-table-row {
+  cursor: pointer;
+}
+
+button.trace-table-row:hover,
+button.trace-table-row.selected {
+  background: #eef5f1;
+}
+
+.trace-table-row.failed {
+  box-shadow: inset 3px 0 0 #bd3838;
+}
+
+.url-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trace-inspector {
+  overflow: auto;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 7px 10px;
+  padding: 10px;
+  color: #566171;
+  font-size: 12px;
+}
+
+.inspector-grid strong {
+  color: #1d232a;
+}
+
+.inspector-grid strong.ok,
+.trace-table-row strong.ok {
+  color: #226947;
+}
+
+.inspector-grid strong.bad,
+.trace-table-row strong.bad {
+  color: #bd3838;
+}
+
+.evidence-block {
+  border-top: 1px solid #edf0f3;
+}
+
+.evidence-line {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  padding: 8px 10px 0;
+  color: #566171;
+  font-size: 12px;
+}
+
+.evidence-line strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #1d232a;
 }
 
 .trace-heading {
