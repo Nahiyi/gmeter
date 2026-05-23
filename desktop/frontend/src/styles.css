@@ -196,7 +196,7 @@ textarea {
 
 .request-form {
   display: grid;
-  grid-template-rows: auto auto minmax(130px, 0.7fr) auto minmax(160px, 1fr);
+  grid-template-rows: auto auto minmax(130px, 0.55fr) auto minmax(320px, 1.4fr);
   gap: 12px;
   min-height: 0;
   overflow: auto;
@@ -262,6 +262,7 @@ textarea {
 }
 
 .json-preview textarea {
+  min-height: 320px;
   background: #fbfcfd;
   color: #46505d;
 }
