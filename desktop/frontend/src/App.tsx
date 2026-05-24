@@ -425,13 +425,22 @@ function App() {
     return "started";
   }
 
-  async function handleRun() {
+  async function handleRunItemCommand() {
     if (isRunning) return;
+    if (!selectedItem) return;
     try {
-      if (selectedItem) {
-        await startItemRun(selectedGroup, selectedItem, true, false);
-        return;
-      }
+      await startItemRun(selectedGroup, selectedItem, true, false);
+    } catch (error) {
+      activeRunTargetRef.current = null;
+      setStatusKey("status.failed");
+      appendConsole(`${t("console.runFailed")}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  async function handleRunGroupCommand() {
+    if (isRunning) return;
+    if (selectedItem) return;
+    try {
       await handleRunGroup(selectedGroup);
     } catch (error) {
       activeRunTargetRef.current = null;
@@ -546,6 +555,8 @@ function App() {
   return (
     <main className="app-shell">
       <Titlebar
+        canRunGroup={selectedKind === "group" && !isRunning}
+        canRunItem={selectedKind === "item" && !isRunning}
         fileInputRef={fileInputRef}
         isRunning={isRunning}
         locale={locale}
@@ -555,7 +566,8 @@ function App() {
         }}
         onOpenClick={handleOpenClick}
         onOpenFile={handleOpenFile}
-        onRun={handleRun}
+        onRunGroup={handleRunGroupCommand}
+        onRunItem={handleRunItemCommand}
         onSave={handleSave}
         onStop={handleStop}
         onThemePreferenceChange={(nextTheme) => {

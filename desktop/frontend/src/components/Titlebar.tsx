@@ -4,13 +4,16 @@ import type { I18nKey, Locale } from "../i18n";
 import type { ThemePreference } from "../theme";
 
 export function Titlebar(props: {
+  canRunGroup: boolean;
+  canRunItem: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
   isRunning: boolean;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
   onOpenClick: () => void;
   onOpenFile: (event: ChangeEvent<HTMLInputElement>) => void;
-  onRun: () => void;
+  onRunGroup: () => void;
+  onRunItem: () => void;
   onSave: () => void;
   onStop: () => void;
   onThemePreferenceChange: (theme: ThemePreference) => void;
@@ -99,9 +102,28 @@ export function Titlebar(props: {
             <span className="icon stop-icon" aria-hidden="true" />
           </button>
         ) : (
-          <button type="button" className="icon-command titlebar-control primary" aria-label={props.t("command.startRun")} title={props.t("command.startRun")} onClick={props.onRun}>
-            <span className="icon run-icon" aria-hidden="true" />
-          </button>
+          <div className="run-command-group" aria-label={props.t("command.startRun")}>
+            <button
+              type="button"
+              className="icon-command titlebar-control primary"
+              aria-label={props.t("command.startGroupRun")}
+              disabled={!props.canRunGroup}
+              title={props.t("command.startGroupRun")}
+              onClick={props.onRunGroup}
+            >
+              <span className="icon run-group-icon" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="icon-command titlebar-control primary"
+              aria-label={props.t("command.startItemRun")}
+              disabled={!props.canRunItem}
+              title={props.t("command.startItemRun")}
+              onClick={props.onRunItem}
+            >
+              <span className="icon run-icon" aria-hidden="true" />
+            </button>
+          </div>
         )}
         <div className="window-controls" aria-label="Window controls">
           <button type="button" className="window-command" aria-label={props.t("command.minimize")} title={props.t("command.minimize")} onClick={WindowMinimise}>

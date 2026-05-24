@@ -4,9 +4,12 @@ import { readFileSync } from "node:fs";
 
 const resultsCss = readFileSync(new URL("../src/styles/results.css", import.meta.url), "utf8");
 const baseCss = readFileSync(new URL("../src/styles/base.css", import.meta.url), "utf8");
+const configCss = readFileSync(new URL("../src/styles/config.css", import.meta.url), "utf8");
 const layoutCss = readFileSync(new URL("../src/styles/layout.css", import.meta.url), "utf8");
 const summaryCss = readFileSync(new URL("../src/styles/summary.css", import.meta.url), "utf8");
 const appTsx = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+const runSetupPanelTsx = readFileSync(new URL("../src/components/RunSetupPanel.tsx", import.meta.url), "utf8");
+const titlebarTsx = readFileSync(new URL("../src/components/Titlebar.tsx", import.meta.url), "utf8");
 
 describe("results workbench layout css", () => {
   it("keeps trace filter labels horizontal in narrow windows", () => {
@@ -36,8 +39,54 @@ describe("results workbench layout css", () => {
   it("keeps custom titlebar controls visually aligned", () => {
     assert.match(layoutCss, /\.titlebar-control[^{]*\{[^}]*display:\s*inline-grid;[^}]*place-items:\s*center;[^}]*width:\s*34px;[^}]*height:\s*32px;/s);
     assert.match(layoutCss, /\.menu-trigger[^{]*\{[^}]*background:\s*transparent;[^}]*border-color:\s*transparent;/s);
+    assert.match(layoutCss, /button\.icon-command\.primary:not\(:disabled\):hover[^{]*\{[^}]*background:\s*#286849;/s);
+    assert.match(layoutCss, /button\.icon-command\.primary:disabled[^{]*\{[^}]*background:\s*#2f7a54;[^}]*cursor:\s*not-allowed;/s);
+    assert.match(layoutCss, /button\.icon-command\.primary:disabled:hover[^{]*\{[^}]*background:\s*#2f7a54;/s);
     assert.match(layoutCss, /\.window-command[^{]*\{[^}]*width:\s*40px;[^}]*height:\s*100%;/s);
     assert.match(layoutCss, /\.minimize-icon::before[^{]*\{[^}]*top:\s*6px;[^}]*height:\s*1\.5px;/s);
+  });
+
+  it("keeps the run setup content scrollable in short windows", () => {
+    assert.match(runSetupPanelTsx, /className="setup-panel-body"/s);
+    assert.match(runSetupPanelTsx, /className="setup-summary-body"/s);
+    assert.match(layoutCss, /\.app-shell[^{]*\{[^}]*overflow:\s*hidden;/s);
+    assert.match(layoutCss, /\.workspace[^{]*\{[^}]*overflow:\s*hidden;/s);
+    assert.match(configCss, /\.setup-panel[^{]*\{[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\);[^}]*height:\s*100%;[^}]*overflow:\s*hidden;/s);
+    assert.match(configCss, /\.setup-panel-body[^{]*\{[^}]*grid-template-rows:\s*minmax\(150px,\s*1fr\) minmax\(180px,\s*0\.8fr\);[^}]*overflow:\s*hidden;/s);
+    assert.match(configCss, /\.plan-navigator[^{]*\{[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\);[^}]*overflow:\s*hidden;/s);
+    assert.match(configCss, /\.plan-tree[^{]*\{[^}]*overflow-y:\s*auto;/s);
+    assert.match(configCss, /\.setup-summary[^{]*\{[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\);[^}]*min-height:\s*0;/s);
+    assert.match(configCss, /\.setup-summary-body[^{]*\{[^}]*overflow-y:\s*auto;/s);
+  });
+
+  it("separates group and item run commands by selection level", () => {
+    assert.match(titlebarTsx, /canRunGroup:\s*boolean/s);
+    assert.match(titlebarTsx, /canRunItem:\s*boolean/s);
+    assert.match(titlebarTsx, /onRunGroup:\s*\(\)\s*=>\s*void/s);
+    assert.match(titlebarTsx, /onRunItem:\s*\(\)\s*=>\s*void/s);
+    assert.match(titlebarTsx, /className="icon run-group-icon"/s);
+    assert.match(titlebarTsx, /disabled=\{!props\.canRunGroup\}/s);
+    assert.match(titlebarTsx, /disabled=\{!props\.canRunItem\}/s);
+    assert.match(appTsx, /canRunGroup=\{selectedKind === "group" && !isRunning\}/s);
+    assert.match(appTsx, /canRunItem=\{selectedKind === "item" && !isRunning\}/s);
+  });
+
+  it("allows groups in the plan navigator to collapse without removing the group row", () => {
+    const planNavigatorTsx = readFileSync(new URL("../src/components/plan/PlanNavigator.tsx", import.meta.url), "utf8");
+    assert.match(planNavigatorTsx, /useState<Set<string>>/s);
+    assert.match(planNavigatorTsx, /plan-collapse-button/s);
+    assert.match(planNavigatorTsx, /aria-expanded=\{!collapsedGroupIDs\.has\(group\.id\)\}/s);
+    assert.match(planNavigatorTsx, /!collapsedGroupIDs\.has\(group\.id\) \? \(/s);
+    assert.match(configCss, /\.plan-collapse-button[^{]*\{/s);
+    assert.match(configCss, /\.collapse-chevron[^{]*\{[^}]*transform:\s*rotate\(45deg\);/s);
+    assert.match(configCss, /\.plan-collapse-button\.collapsed \.collapse-chevron[^{]*\{[^}]*transform:\s*rotate\(-45deg\);/s);
+  });
+
+  it("uses clean plan tree folder and item icons", () => {
+    assert.match(configCss, /\.folder-icon[^{]*\{[^}]*width:\s*14px;[^}]*height:\s*12px;[^}]*border:\s*none;/s);
+    assert.match(configCss, /\.folder-icon::before[^{]*\{[^}]*box-sizing:\s*border-box;[^}]*top:\s*4px;[^}]*width:\s*13px;[^}]*height:\s*8px;/s);
+    assert.match(configCss, /\.folder-icon::after[^{]*\{[^}]*box-sizing:\s*border-box;[^}]*top:\s*1px;[^}]*width:\s*7px;[^}]*border-bottom:\s*none;/s);
+    assert.match(configCss, /\.item-icon[^{]*\{[^}]*border:\s*1\.5px solid currentColor;/s);
   });
 
   it("supports dark theme and blocks browser-style zoom gestures", () => {

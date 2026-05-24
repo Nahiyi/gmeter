@@ -3,6 +3,7 @@
   grid-template-rows: 40px 1fr;
   height: 100%;
   background: #e7e9ec;
+  overflow: hidden;
 }
 
 .titlebar {
@@ -96,6 +97,40 @@
 
 .icon-command {
   border-radius: 4px;
+}
+
+.run-command-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.titlebar-control:disabled {
+  border-color: transparent;
+  background: transparent;
+  color: #87919d;
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+button.icon-command.primary:not(:disabled):hover {
+  border-color: #20583d;
+  background: #286849;
+  color: #ffffff;
+}
+
+button.icon-command.primary:disabled {
+  border-color: #266547;
+  background: #2f7a54;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+button.icon-command.primary:disabled:hover {
+  border-color: #266547;
+  background: #2f7a54;
+  color: #ffffff;
 }
 
 .window-controls {
@@ -211,6 +246,31 @@
   transform: translateX(1px);
 }
 
+.run-group-icon {
+  width: 18px;
+  height: 16px;
+}
+
+.run-group-icon::before,
+.run-group-icon::after {
+  position: absolute;
+  top: 2px;
+  width: 0;
+  height: 0;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid currentColor;
+  border-top: 6px solid transparent;
+  content: "";
+}
+
+.run-group-icon::before {
+  left: 1px;
+}
+
+.run-group-icon::after {
+  left: 8px;
+}
+
 .stop-icon {
   width: 12px;
   height: 12px;
@@ -273,6 +333,7 @@
   gap: 1px;
   min-height: 0;
   background: #c8cdd3;
+  overflow: hidden;
 }
 
 .workspace.setup-collapsed {

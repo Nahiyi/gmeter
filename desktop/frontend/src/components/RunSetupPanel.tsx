@@ -59,58 +59,62 @@ export function RunSetupPanel(props: {
         </div>
       </div>
 
-      <PlanNavigator
-        onAddGroup={props.onAddGroup}
-        onAddItem={props.onAddItem}
-        onDeleteGroup={props.onDeleteGroup}
-        onDeleteItem={props.onDeleteItem}
-        onSelectGroup={props.onSelectGroup}
-        onSelectItem={props.onSelectItem}
-        selection={props.selection}
-        t={props.t}
-        workspace={props.workspace}
-      />
+      <div className="setup-panel-body">
+        <PlanNavigator
+          onAddGroup={props.onAddGroup}
+          onAddItem={props.onAddItem}
+          onDeleteGroup={props.onDeleteGroup}
+          onDeleteItem={props.onDeleteItem}
+          onSelectGroup={props.onSelectGroup}
+          onSelectItem={props.onSelectItem}
+          selection={props.selection}
+          t={props.t}
+          workspace={props.workspace}
+        />
 
-      <section className="setup-summary">
-        <div className="trace-heading">{props.t("setup.planSummary")}</div>
-        <div className="setup-summary-grid">
-          <span>{props.t("plan.selectedTarget")}</span>
-          <strong>{props.selectedName}</strong>
-          <span>{props.t("setup.mode")}</span>
-          <strong>{props.execution.dryRun ? props.t("setup.modeDryRun") : props.t("setup.modeLoad")}</strong>
-          <span>{props.t("setup.totalRequests")}</span>
-          <strong>{totalRequests}</strong>
-          <span>{props.t("setup.threadLoad")}</span>
-          <strong>{props.execution.threads} × {props.execution.loops}</strong>
-          <span>{props.t("setup.rampProfile")}</span>
-          <strong>{rampRate}</strong>
-          <span>{props.t("setup.userProfiles")}</span>
-          <strong>{props.usersCount}</strong>
-          <span>{props.t("setup.timeoutBudget")}</span>
-          <strong>{props.execution.requestTimeoutMs}ms</strong>
-          <span>{props.t("setup.userCoverage")}</span>
-          <strong>{userCoverage}</strong>
-        </div>
-        <div className="setup-summary-grid setup-detail-grid">
-          <span>{props.t("plan.groups")}</span>
-          <strong>{props.groupCount}</strong>
-          <span>{props.t("plan.items")}</span>
-          <strong>{props.itemCount}</strong>
-          <span>{props.t("setup.requestShape")}</span>
-          <strong>{props.requestMethod}</strong>
-          <span>{props.t("setup.sharedHeaders")}</span>
-          <strong>{props.requestHeaderCount}</strong>
-          <span>{props.t("setup.userHeaders")}</span>
-          <strong>{props.userHeaderCount}</strong>
-          <span>{props.t("setup.bodySize")}</span>
-          <strong>{props.bodyBytes} B</strong>
-        </div>
-        <div className="setup-url">
-          <span>URL</span>
-          <strong>{props.requestURL || "-"}</strong>
-        </div>
-        <p>{props.t("setup.readyPlan")}</p>
-      </section>
+        <section className="setup-summary">
+          <div className="trace-heading">{props.t("setup.planSummary")}</div>
+          <div className="setup-summary-body">
+            <div className="setup-summary-grid">
+              <span>{props.t("plan.selectedTarget")}</span>
+              <strong>{props.selectedName}</strong>
+              <span>{props.t("setup.mode")}</span>
+              <strong>{props.execution.dryRun ? props.t("setup.modeDryRun") : props.t("setup.modeLoad")}</strong>
+              <span>{props.t("setup.totalRequests")}</span>
+              <strong>{totalRequests}</strong>
+              <span>{props.t("setup.threadLoad")}</span>
+              <strong>{props.execution.threads} × {props.execution.loops}</strong>
+              <span>{props.t("setup.rampProfile")}</span>
+              <strong>{rampRate}</strong>
+              <span>{props.t("setup.userProfiles")}</span>
+              <strong>{props.usersCount}</strong>
+              <span>{props.t("setup.timeoutBudget")}</span>
+              <strong>{props.execution.requestTimeoutMs}ms</strong>
+              <span>{props.t("setup.userCoverage")}</span>
+              <strong>{userCoverage}</strong>
+            </div>
+            <div className="setup-summary-grid setup-detail-grid">
+              <span>{props.t("plan.groups")}</span>
+              <strong>{props.groupCount}</strong>
+              <span>{props.t("plan.items")}</span>
+              <strong>{props.itemCount}</strong>
+              <span>{props.t("setup.requestShape")}</span>
+              <strong>{props.requestMethod}</strong>
+              <span>{props.t("setup.sharedHeaders")}</span>
+              <strong>{props.requestHeaderCount}</strong>
+              <span>{props.t("setup.userHeaders")}</span>
+              <strong>{props.userHeaderCount}</strong>
+              <span>{props.t("setup.bodySize")}</span>
+              <strong>{props.bodyBytes} B</strong>
+            </div>
+            <div className="setup-url">
+              <span>URL</span>
+              <strong>{props.requestURL || "-"}</strong>
+            </div>
+            <p>{props.t("setup.readyPlan")}</p>
+          </div>
+        </section>
+      </div>
     </aside>
   );
 }

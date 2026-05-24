@@ -12,6 +12,8 @@ export type I18nKey =
   | "command.language"
   | "command.theme"
   | "command.startRun"
+  | "command.startGroupRun"
+  | "command.startItemRun"
   | "command.stopRun"
   | "command.minimize"
   | "command.maximize"
@@ -185,6 +187,8 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.language": "Language",
     "command.theme": "Theme",
     "command.startRun": "Start run",
+    "command.startGroupRun": "Run group",
+    "command.startItemRun": "Run item",
     "command.stopRun": "Stop run",
     "command.minimize": "Minimize",
     "command.maximize": "Maximize",
@@ -357,6 +361,8 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.language": "语言",
     "command.theme": "主题",
     "command.startRun": "开始运行",
+    "command.startGroupRun": "运行组",
+    "command.startItemRun": "运行测试项",
     "command.stopRun": "停止运行",
     "command.minimize": "最小化",
     "command.maximize": "最大化",

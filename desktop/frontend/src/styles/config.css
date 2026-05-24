@@ -1,16 +1,30 @@
 .setup-panel {
   display: grid;
-  align-content: start;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 12px;
-  overflow: auto;
+  height: 100%;
+  overflow: hidden;
+}
+
+.setup-panel-body {
+  display: grid;
+  grid-template-rows: minmax(150px, 1fr) minmax(180px, 0.8fr);
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+  padding-right: 2px;
 }
 
 .plan-navigator {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
+  min-height: 0;
   border: 1px solid #c5cbd2;
   border-radius: 4px;
   background: #ffffff;
   padding: 9px;
+  overflow: hidden;
 }
 
 .plan-navigator .subheading {
@@ -19,7 +33,12 @@
 
 .plan-tree {
   display: grid;
+  align-content: start;
   gap: 6px;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .plan-group {
@@ -33,6 +52,10 @@
   align-items: center;
   gap: 4px;
   min-width: 0;
+}
+
+.plan-node-row.group-row {
+  grid-template-columns: minmax(0, 1fr) 24px 26px;
 }
 
 .plan-node {
@@ -99,6 +122,38 @@
   color: #6d7783;
 }
 
+.plan-collapse-button {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  min-width: 24px;
+  height: 26px;
+  border-color: transparent;
+  background: transparent;
+  padding: 0;
+  color: #6d7783;
+}
+
+.plan-collapse-button:hover {
+  border-color: #c8cdd3;
+  background: #f2f4f6;
+  color: #3d566d;
+}
+
+.collapse-chevron {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+
+.plan-collapse-button.collapsed .collapse-chevron {
+  transform: rotate(-45deg);
+}
+
 .plan-delete-button:hover {
   border-color: #d4a0a0;
   background: #f7eeee;
@@ -134,13 +189,28 @@
 }
 
 .folder-icon {
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
+  width: 14px;
+  height: 12px;
+  border: none;
+  transform: translateY(1px);
 }
 
 .folder-icon::before {
   position: absolute;
-  top: -4px;
+  box-sizing: border-box;
+  top: 4px;
+  left: 0;
+  width: 13px;
+  height: 8px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  content: "";
+}
+
+.folder-icon::after {
+  position: absolute;
+  box-sizing: border-box;
+  top: 1px;
   left: 1px;
   width: 7px;
   height: 4px;
@@ -213,10 +283,19 @@
 }
 
 .setup-summary {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
   border: 1px solid #c5cbd2;
   border-radius: 4px;
   background: #ffffff;
   overflow: hidden;
+}
+
+.setup-summary-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .setup-summary-grid {

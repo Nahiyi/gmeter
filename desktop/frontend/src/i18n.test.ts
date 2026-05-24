@@ -17,6 +17,10 @@ describe("titlebar command labels", () => {
     assert.equal(translate("zh", "command.menu"), "菜单");
     assert.equal(translate("en", "command.startRun"), "Start run");
     assert.equal(translate("zh", "command.startRun"), "开始运行");
+    assert.equal(translate("en", "command.startGroupRun"), "Run group");
+    assert.equal(translate("zh", "command.startGroupRun"), "运行组");
+    assert.equal(translate("en", "command.startItemRun"), "Run item");
+    assert.equal(translate("zh", "command.startItemRun"), "运行测试项");
     assert.equal(translate("en", "command.stopRun"), "Stop run");
     assert.equal(translate("zh", "command.stopRun"), "停止运行");
     assert.equal(translate("en", "command.minimize"), "Minimize");
