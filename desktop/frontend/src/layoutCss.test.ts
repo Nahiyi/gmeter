@@ -50,7 +50,23 @@ describe("results workbench layout css", () => {
   it("uses an in-app delete confirmation dialog instead of browser confirm", () => {
     assert.doesNotMatch(appTsx, /window\.confirm/);
     assert.match(appTsx, /<ConfirmDialog/s);
+    assert.doesNotMatch(baseCss, /\.confirm-dialog-icon/);
+    assert.doesNotMatch(readFileSync(new URL("../src/components/ConfirmDialog.tsx", import.meta.url), "utf8"), /confirm-dialog-icon/);
     assert.match(baseCss, /\.modal-backdrop[^{]*\{/s);
     assert.match(baseCss, /\.confirm-dialog[^{]*\{/s);
+    assert.match(baseCss, /\.confirm-dialog::before[^{]*\{/s);
+  });
+
+  it("shows a bounded hierarchy preview when deleting a group", () => {
+    const confirmDialogTsx = readFileSync(new URL("../src/components/ConfirmDialog.tsx", import.meta.url), "utf8");
+    assert.match(appTsx, /previewItems:\s*group\.items\.slice\(0,\s*5\)\.map\(\(item\)\s*=>\s*item\.name\)/s);
+    assert.match(appTsx, /hiddenItemCount:\s*Math\.max\(0,\s*group\.items\.length - 5\)/s);
+    assert.match(appTsx, /translate\(locale,\s*"plan\.moreItems"\)\.replace\("\{count\}",\s*String\(confirmDeleteRequest\.hiddenItemCount\)\)/s);
+    assert.match(confirmDialogTsx, /previewItems\?:\s*string\[\]/s);
+    assert.match(confirmDialogTsx, /overflowLabel\?:\s*string/s);
+    assert.match(confirmDialogTsx, /confirm-dialog-children/s);
+    assert.match(confirmDialogTsx, /confirm-dialog-more/s);
+    assert.match(baseCss, /\.confirm-dialog-child[^{]*\{[^}]*padding-left:\s*18px;/s);
+    assert.match(baseCss, /\.confirm-dialog-more[^{]*\{/s);
   });
 });

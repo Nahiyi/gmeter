@@ -7,6 +7,8 @@ export function ConfirmDialog(props: {
   message: string;
   onCancel: () => void;
   onConfirm: () => void;
+  overflowLabel?: string;
+  previewItems?: string[];
   targetName: string;
   title: string;
 }) {
@@ -33,13 +35,20 @@ export function ConfirmDialog(props: {
         role="dialog"
       >
         <div className="confirm-dialog-head">
-          <span className="confirm-dialog-icon" aria-hidden="true" />
-          <div>
-            <h2 id="confirm-dialog-title">{props.title}</h2>
-            <p>{props.message}</p>
-          </div>
+          <h2 id="confirm-dialog-title">{props.title}</h2>
+          <p>{props.message}</p>
         </div>
-        <div className="confirm-dialog-target">{props.targetName}</div>
+        <div className="confirm-dialog-target">
+          <div className="confirm-dialog-target-main">{props.targetName}</div>
+          {(props.previewItems?.length || props.overflowLabel) ? (
+            <div className="confirm-dialog-children">
+              {props.previewItems?.map((name, index) => (
+                <div className="confirm-dialog-child" key={`${name}-${index}`}>{name}</div>
+              ))}
+              {props.overflowLabel ? <div className="confirm-dialog-more">{props.overflowLabel}</div> : null}
+            </div>
+          ) : null}
+        </div>
         <div className="confirm-dialog-actions">
           <button type="button" onClick={props.onCancel}>{props.cancelLabel}</button>
           <button type="button" className="danger" onClick={props.onConfirm}>{props.confirmLabel}</button>

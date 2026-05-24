@@ -51,7 +51,7 @@ type WorkbenchState = {
 };
 
 type ConfirmDeleteRequest =
-  | { type: "group"; groupId: string; name: string }
+  | { type: "group"; groupId: string; name: string; previewItems: string[]; hiddenItemCount: number }
   | { type: "item"; groupId: string; itemId: string; name: string };
 
 function createInitialWorkbenchState(): WorkbenchState {
@@ -214,6 +214,9 @@ function App() {
     () => queryTraces(recentTraces, { latencyRange, search: traceSearch, sort: traceSort, status: statusFilter, traceFilter }),
     [latencyRange, recentTraces, statusFilter, traceFilter, traceSearch, traceSort]
   );
+  const deleteOverflowLabel = confirmDeleteRequest?.type === "group" && confirmDeleteRequest.hiddenItemCount > 0
+    ? translate(locale, "plan.moreItems").replace("{count}", String(confirmDeleteRequest.hiddenItemCount))
+    : undefined;
 
   const metrics = useMemo(
     () => {
@@ -308,7 +311,13 @@ function App() {
   function handleDeleteGroup(groupID: string) {
     const group = findWorkbenchGroup(workspace, groupID);
     if (!group || workspace.groups.length <= 1) return;
-    setConfirmDeleteRequest({ type: "group", groupId: groupID, name: group.name });
+    setConfirmDeleteRequest({
+      type: "group",
+      groupId: groupID,
+      name: group.name,
+      previewItems: group.items.slice(0, 5).map((item) => item.name),
+      hiddenItemCount: Math.max(0, group.items.length - 5)
+    });
   }
 
   function handleConfirmDelete() {
@@ -672,6 +681,8 @@ function App() {
         message={confirmDeleteRequest?.type === "group" ? t("plan.confirmDeleteGroup") : t("plan.confirmDeleteItem")}
         onCancel={() => setConfirmDeleteRequest(null)}
         onConfirm={handleConfirmDelete}
+        overflowLabel={deleteOverflowLabel}
+        previewItems={confirmDeleteRequest?.type === "group" ? confirmDeleteRequest.previewItems : undefined}
         targetName={confirmDeleteRequest?.name ?? ""}
         title={t("plan.deleteTitle")}
       />

@@ -32,6 +32,7 @@ export type I18nKey =
   | "plan.confirmDeleteGroup"
   | "plan.confirmDeleteItem"
   | "plan.deleteTitle"
+  | "plan.moreItems"
   | "plan.keepOneGroup"
   | "plan.execution"
   | "plan.groupName"
@@ -204,6 +205,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "plan.confirmDeleteGroup": "Delete this group and all of its test items?",
     "plan.confirmDeleteItem": "Delete this test item?",
     "plan.deleteTitle": "Confirm deletion",
+    "plan.moreItems": "and {count} more...",
     "plan.keepOneGroup": "At least one group is required",
     "plan.execution": "Execution",
     "plan.groupName": "Group Name",
@@ -375,6 +377,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "plan.confirmDeleteGroup": "确定删除该组及其全部测试项吗？",
     "plan.confirmDeleteItem": "确定删除该测试项吗？",
     "plan.deleteTitle": "确认删除",
+    "plan.moreItems": "等 {count} 个...",
     "plan.keepOneGroup": "至少需要保留一个组",
     "plan.execution": "执行配置",
     "plan.groupName": "组名称",
