@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/desktop/App";
 import { desktop, engine } from "../wailsjs/go/models";
 import { EventsOn, WindowSetDarkTheme, WindowSetLightTheme, WindowSetSystemDefaultTheme } from "../wailsjs/runtime/runtime";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ConfigEditor } from "./components/config/ConfigEditor";
 import { ExecutionEditor } from "./components/plan/ExecutionEditor";
 import { GroupEditor } from "./components/plan/GroupEditor";
@@ -49,6 +50,10 @@ type WorkbenchState = {
   selection: WorkbenchSelection;
 };
 
+type ConfirmDeleteRequest =
+  | { type: "group"; groupId: string; name: string }
+  | { type: "item"; groupId: string; itemId: string; name: string };
+
 function createInitialWorkbenchState(): WorkbenchState {
   const workspace = createDefaultWorkbenchConfig();
   return {
@@ -79,6 +84,7 @@ function App() {
   const [isSetupCollapsed, setIsSetupCollapsed] = useState(false);
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
   const [isGroupRunning, setIsGroupRunning] = useState(false);
+  const [confirmDeleteRequest, setConfirmDeleteRequest] = useState<ConfirmDeleteRequest | null>(null);
   const [consoleLines, setConsoleLines] = useState<string[]>([
     translate(getSavedLocale(), "console.ready")
   ]);
@@ -302,8 +308,21 @@ function App() {
   function handleDeleteGroup(groupID: string) {
     const group = findWorkbenchGroup(workspace, groupID);
     if (!group || workspace.groups.length <= 1) return;
-    if (!window.confirm(`${t("plan.confirmDeleteGroup")}\n${group.name}`)) return;
+    setConfirmDeleteRequest({ type: "group", groupId: groupID, name: group.name });
+  }
 
+  function handleConfirmDelete() {
+    if (!confirmDeleteRequest) return;
+
+    if (confirmDeleteRequest.type === "group") {
+      confirmDeleteGroup(confirmDeleteRequest.groupId);
+    } else {
+      confirmDeleteItem(confirmDeleteRequest.groupId, confirmDeleteRequest.itemId);
+    }
+    setConfirmDeleteRequest(null);
+  }
+
+  function confirmDeleteGroup(groupID: string) {
     setWorkbenchState((current) => {
       const nextWorkspace = removeWorkbenchGroup(current.workspace, groupID);
       return {
@@ -317,8 +336,10 @@ function App() {
     const group = findWorkbenchGroup(workspace, groupID);
     const item = findWorkbenchItem(group, itemID);
     if (!group || !item) return;
-    if (!window.confirm(`${t("plan.confirmDeleteItem")}\n${item.name}`)) return;
+    setConfirmDeleteRequest({ type: "item", groupId: groupID, itemId: itemID, name: item.name });
+  }
 
+  function confirmDeleteItem(groupID: string, itemID: string) {
     setWorkbenchState((current) => {
       const nextWorkspace = removeWorkbenchItem(current.workspace, groupID, itemID);
       const nextGroup = findWorkbenchGroup(nextWorkspace, groupID);
@@ -643,6 +664,17 @@ function App() {
           t={t}
         />
       </section>
+
+      <ConfirmDialog
+        cancelLabel={t("command.cancel")}
+        confirmLabel={t("command.delete")}
+        isOpen={confirmDeleteRequest !== null}
+        message={confirmDeleteRequest?.type === "group" ? t("plan.confirmDeleteGroup") : t("plan.confirmDeleteItem")}
+        onCancel={() => setConfirmDeleteRequest(null)}
+        onConfirm={handleConfirmDelete}
+        targetName={confirmDeleteRequest?.name ?? ""}
+        title={t("plan.deleteTitle")}
+      />
     </main>
   );
 }

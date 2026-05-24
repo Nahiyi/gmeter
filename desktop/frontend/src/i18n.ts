@@ -7,6 +7,7 @@ export type I18nKey =
   | "command.save"
   | "command.run"
   | "command.stop"
+  | "command.cancel"
   | "command.menu"
   | "command.language"
   | "command.theme"
@@ -30,6 +31,7 @@ export type I18nKey =
   | "plan.deleteItem"
   | "plan.confirmDeleteGroup"
   | "plan.confirmDeleteItem"
+  | "plan.deleteTitle"
   | "plan.keepOneGroup"
   | "plan.execution"
   | "plan.groupName"
@@ -177,6 +179,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.save": "Save",
     "command.run": "Run",
     "command.stop": "Stop",
+    "command.cancel": "Cancel",
     "command.menu": "Menu",
     "command.language": "Language",
     "command.theme": "Theme",
@@ -200,6 +203,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "plan.deleteItem": "Delete item",
     "plan.confirmDeleteGroup": "Delete this group and all of its test items?",
     "plan.confirmDeleteItem": "Delete this test item?",
+    "plan.deleteTitle": "Confirm deletion",
     "plan.keepOneGroup": "At least one group is required",
     "plan.execution": "Execution",
     "plan.groupName": "Group Name",
@@ -346,6 +350,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.save": "保存",
     "command.run": "运行",
     "command.stop": "停止",
+    "command.cancel": "取消",
     "command.menu": "菜单",
     "command.language": "语言",
     "command.theme": "主题",
@@ -369,6 +374,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "plan.deleteItem": "删除测试项",
     "plan.confirmDeleteGroup": "确定删除该组及其全部测试项吗？",
     "plan.confirmDeleteItem": "确定删除该测试项吗？",
+    "plan.deleteTitle": "确认删除",
     "plan.keepOneGroup": "至少需要保留一个组",
     "plan.execution": "执行配置",
     "plan.groupName": "组名称",

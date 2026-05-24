@@ -46,4 +46,11 @@ describe("results workbench layout css", () => {
     assert.match(appTsx, /addEventListener\("wheel"[^;]+passive:\s*false/s);
     assert.match(appTsx, /event\.ctrlKey[\s\S]+event\.preventDefault\(\)/s);
   });
+
+  it("uses an in-app delete confirmation dialog instead of browser confirm", () => {
+    assert.doesNotMatch(appTsx, /window\.confirm/);
+    assert.match(appTsx, /<ConfirmDialog/s);
+    assert.match(baseCss, /\.modal-backdrop[^{]*\{/s);
+    assert.match(baseCss, /\.confirm-dialog[^{]*\{/s);
+  });
 });

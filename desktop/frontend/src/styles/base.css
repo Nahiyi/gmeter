@@ -167,6 +167,98 @@ textarea {
   color: #bd3838;
 }
 
+.modal-backdrop {
+  --wails-draggable: no-drag;
+  position: fixed;
+  inset: 40px 0 0;
+  z-index: 40;
+  display: grid;
+  place-items: start center;
+  background: rgb(22 27 32 / 28%);
+  padding-top: 72px;
+}
+
+.confirm-dialog {
+  width: min(440px, calc(100vw - 64px));
+  border: 1px solid #aeb6bf;
+  border-radius: 6px;
+  background: #f8f9fa;
+  box-shadow: 0 18px 46px rgb(29 35 42 / 24%);
+  overflow: hidden;
+}
+
+.confirm-dialog-head {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  border-bottom: 1px solid #dde1e5;
+  padding: 18px 18px 14px;
+}
+
+.confirm-dialog-icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #c96d6d;
+  border-radius: 50%;
+  color: #b83a3a;
+}
+
+.confirm-dialog-icon::before {
+  width: 2px;
+  height: 12px;
+  border-radius: 2px;
+  background: currentColor;
+  content: "";
+}
+
+.confirm-dialog-icon::after {
+  position: absolute;
+  bottom: 6px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.confirm-dialog h2 {
+  margin: 0;
+  color: #1d232a;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.confirm-dialog p {
+  margin: 7px 0 0;
+  color: #566171;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.confirm-dialog-target {
+  margin: 14px 18px 0;
+  border: 1px solid #d0d6dd;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1d232a;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 18px 18px;
+}
+
 html[data-theme="dark"] {
   color: #d8dee7;
   background: #14181d;
@@ -198,6 +290,8 @@ html[data-theme="dark"] button,
 html[data-theme="dark"] input,
 html[data-theme="dark"] select,
 html[data-theme="dark"] textarea,
+html[data-theme="dark"] .confirm-dialog,
+html[data-theme="dark"] .confirm-dialog-target,
 html[data-theme="dark"] .segmented-control,
 html[data-theme="dark"] .filter-group,
 html[data-theme="dark"] .metric,
@@ -250,8 +344,22 @@ html[data-theme="dark"] .close-command:hover {
   color: #ffffff;
 }
 
+html[data-theme="dark"] .modal-backdrop {
+  background: rgb(7 10 13 / 44%);
+}
+
+html[data-theme="dark"] .confirm-dialog {
+  box-shadow: 0 18px 48px rgb(0 0 0 / 42%);
+}
+
+html[data-theme="dark"] .confirm-dialog-icon {
+  border-color: #bd5f5f;
+  color: #ef7777;
+}
+
 html[data-theme="dark"] label,
 html[data-theme="dark"] .titlebar-brand span,
+html[data-theme="dark"] .confirm-dialog p,
 html[data-theme="dark"] .panel-heading span,
 html[data-theme="dark"] .metric span,
 html[data-theme="dark"] .result-kpi span,
@@ -271,6 +379,8 @@ html[data-theme="dark"] .evidence-line {
 }
 
 html[data-theme="dark"] .titlebar-brand strong,
+html[data-theme="dark"] .confirm-dialog h2,
+html[data-theme="dark"] .confirm-dialog-target,
 html[data-theme="dark"] .metric strong,
 html[data-theme="dark"] .result-kpi strong,
 html[data-theme="dark"] .setup-summary-grid strong,
@@ -311,6 +421,7 @@ html[data-theme="dark"] .app-menu-popover button:hover {
 
 html[data-theme="dark"] .trace-row,
 html[data-theme="dark"] .trace-table-row,
+html[data-theme="dark"] .confirm-dialog-head,
 html[data-theme="dark"] .group-row,
 html[data-theme="dark"] .plan-items,
 html[data-theme="dark"] .plan-node:hover,
