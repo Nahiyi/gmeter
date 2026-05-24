@@ -11,6 +11,9 @@ export type I18nKey =
   | "command.language"
   | "command.startRun"
   | "command.stopRun"
+  | "command.minimize"
+  | "command.maximize"
+  | "command.close"
   | "command.add"
   | "command.delete"
   | "command.addUser"
@@ -153,6 +156,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.language": "Language",
     "command.startRun": "Start run",
     "command.stopRun": "Stop run",
+    "command.minimize": "Minimize",
+    "command.maximize": "Maximize",
+    "command.close": "Close",
     "command.add": "Add",
     "command.delete": "Del",
     "command.addUser": "Add User",
@@ -294,6 +300,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.language": "语言",
     "command.startRun": "开始运行",
     "command.stopRun": "停止运行",
+    "command.minimize": "最小化",
+    "command.maximize": "最大化",
+    "command.close": "关闭",
     "command.add": "添加",
     "command.delete": "删除",
     "command.addUser": "添加用户",

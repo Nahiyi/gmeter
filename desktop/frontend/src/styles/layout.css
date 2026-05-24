@@ -1,6 +1,6 @@
 .app-shell {
   display: grid;
-  grid-template-rows: 44px 1fr;
+  grid-template-rows: 40px 1fr;
   height: 100%;
   background: #e7e9ec;
 }
@@ -10,8 +10,12 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #c8cdd3;
-  background: #f2f3f5;
-  padding: 0 14px;
+  background: #f3f4f6;
+  padding: 0 0 0 10px;
+}
+
+.titlebar button {
+  --wails-draggable: no-drag;
 }
 
 .titlebar-left {
@@ -19,7 +23,17 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  gap: 8px;
+  gap: 6px;
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+.titlebar-drag-region {
+  --wails-draggable: drag;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  min-width: 0;
   flex: 1 1 auto;
 }
 
@@ -46,45 +60,125 @@
 }
 
 .titlebar-actions {
+  --wails-draggable: no-drag;
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: 8px;
+  gap: 6px;
+  height: 100%;
 }
 
 .file-input {
   display: none;
 }
 
-.menu-trigger,
-.icon-command {
+.titlebar-control {
   display: inline-grid;
   place-items: center;
-  width: 32px;
-  height: 30px;
+  width: 34px;
+  height: 32px;
+  min-width: 34px;
+  border-color: transparent;
+  background: transparent;
   padding: 0;
 }
 
 .menu-trigger {
-  background: #ffffff;
+  background: transparent;
+  border-color: transparent;
+  color: #2f3844;
+}
+
+.titlebar-control:hover {
+  border-color: #c8cdd3;
+  background: #e8ecef;
 }
 
 .icon-command {
-  min-width: 34px;
+  border-radius: 4px;
+}
+
+.window-controls {
+  --wails-draggable: no-drag;
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  margin-left: 0;
+}
+
+.window-command {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #2f3844;
+  padding: 0;
+}
+
+.window-command:hover {
+  background: #dde2e7;
+}
+
+.close-command:hover {
+  background: #c83b3b;
+  color: #ffffff;
+}
+
+.window-icon {
+  position: relative;
+  display: block;
+  width: 11px;
+  height: 11px;
+}
+
+.minimize-icon::before {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 6px;
+  height: 1.5px;
+  background: currentColor;
+  content: "";
+}
+
+.maximize-icon {
+  border: 1.5px solid currentColor;
+}
+
+.close-icon::before,
+.close-icon::after {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 12px;
+  height: 1.5px;
+  background: currentColor;
+  content: "";
+}
+
+.close-icon::before {
+  transform: rotate(45deg);
+}
+
+.close-icon::after {
+  transform: rotate(-45deg);
 }
 
 .icon {
   position: relative;
   display: block;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .menu-icon,
 .menu-icon::before,
 .menu-icon::after {
-  width: 15px;
-  height: 2px;
+  width: 16px;
+  height: 1.5px;
   border-radius: 2px;
   background: currentColor;
 }
@@ -111,15 +205,15 @@
 .run-icon {
   width: 0;
   height: 0;
-  border-bottom: 8px solid transparent;
-  border-left: 12px solid currentColor;
-  border-top: 8px solid transparent;
-  transform: translateX(2px);
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid currentColor;
+  border-top: 7px solid transparent;
+  transform: translateX(1px);
 }
 
 .stop-icon {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   border-radius: 2px;
   background: currentColor;
 }

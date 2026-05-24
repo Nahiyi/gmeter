@@ -19,6 +19,12 @@ describe("titlebar command labels", () => {
     assert.equal(translate("zh", "command.startRun"), "开始运行");
     assert.equal(translate("en", "command.stopRun"), "Stop run");
     assert.equal(translate("zh", "command.stopRun"), "停止运行");
+    assert.equal(translate("en", "command.minimize"), "Minimize");
+    assert.equal(translate("zh", "command.minimize"), "最小化");
+    assert.equal(translate("en", "command.maximize"), "Maximize");
+    assert.equal(translate("zh", "command.maximize"), "最大化");
+    assert.equal(translate("en", "command.close"), "Close");
+    assert.equal(translate("zh", "command.close"), "关闭");
   });
 });
 

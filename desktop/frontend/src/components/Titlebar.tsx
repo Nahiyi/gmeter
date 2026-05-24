@@ -1,4 +1,5 @@
 import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
+import { Quit, WindowMinimise, WindowToggleMaximise } from "../../wailsjs/runtime/runtime";
 import type { I18nKey, Locale } from "../i18n";
 
 export function Titlebar(props: {
@@ -48,7 +49,7 @@ export function Titlebar(props: {
         <div className="app-menu" ref={menuRef}>
           <button
             type="button"
-            className="menu-trigger"
+            className="menu-trigger titlebar-control"
             aria-expanded={menuOpen}
             aria-label={props.t("command.menu")}
             onClick={() => setMenuOpen((open) => !open)}
@@ -74,21 +75,34 @@ export function Titlebar(props: {
             </div>
           ) : null}
         </div>
-        <div className="titlebar-brand">
-          <strong>{props.t("app.title")}</strong>
-          <span>{props.t("app.subtitle")}</span>
+        <div className="titlebar-drag-region">
+          <div className="titlebar-brand">
+            <strong>{props.t("app.title")}</strong>
+            <span>{props.t("app.subtitle")}</span>
+          </div>
         </div>
       </div>
       <div className="titlebar-actions">
         {props.isRunning ? (
-          <button type="button" className="icon-command danger" aria-label={props.t("command.stopRun")} title={props.t("command.stopRun")} onClick={props.onStop}>
+          <button type="button" className="icon-command titlebar-control danger" aria-label={props.t("command.stopRun")} title={props.t("command.stopRun")} onClick={props.onStop}>
             <span className="icon stop-icon" aria-hidden="true" />
           </button>
         ) : (
-          <button type="button" className="icon-command primary" aria-label={props.t("command.startRun")} title={props.t("command.startRun")} onClick={props.onRun}>
+          <button type="button" className="icon-command titlebar-control primary" aria-label={props.t("command.startRun")} title={props.t("command.startRun")} onClick={props.onRun}>
             <span className="icon run-icon" aria-hidden="true" />
           </button>
         )}
+        <div className="window-controls" aria-label="Window controls">
+          <button type="button" className="window-command" aria-label={props.t("command.minimize")} title={props.t("command.minimize")} onClick={WindowMinimise}>
+            <span className="window-icon minimize-icon" aria-hidden="true" />
+          </button>
+          <button type="button" className="window-command" aria-label={props.t("command.maximize")} title={props.t("command.maximize")} onClick={WindowToggleMaximise}>
+            <span className="window-icon maximize-icon" aria-hidden="true" />
+          </button>
+          <button type="button" className="window-command close-command" aria-label={props.t("command.close")} title={props.t("command.close")} onClick={Quit}>
+            <span className="window-icon close-icon" aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </header>
   );

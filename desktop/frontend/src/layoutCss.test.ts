@@ -25,4 +25,17 @@ describe("results workbench layout css", () => {
     assert.doesNotMatch(layoutCss, /\.rail-toggle span[^{]*\{[^}]*rotate\(180deg\)/s);
     assert.match(summaryCss, /\.trace-row[^{]*\{[^}]*grid-template-columns:\s*minmax\(74px,\s*1fr\) 62px 72px;/s);
   });
+
+  it("marks only the custom titlebar drag region as draggable", () => {
+    assert.match(layoutCss, /\.titlebar-drag-region[^{]*\{[^}]*--wails-draggable:\s*drag;/s);
+    assert.match(layoutCss, /\.titlebar button[^{]*\{[^}]*--wails-draggable:\s*no-drag;/s);
+    assert.match(layoutCss, /\.window-controls[^{]*\{[^}]*--wails-draggable:\s*no-drag;/s);
+  });
+
+  it("keeps custom titlebar controls visually aligned", () => {
+    assert.match(layoutCss, /\.titlebar-control[^{]*\{[^}]*display:\s*inline-grid;[^}]*place-items:\s*center;[^}]*width:\s*34px;[^}]*height:\s*32px;/s);
+    assert.match(layoutCss, /\.menu-trigger[^{]*\{[^}]*background:\s*transparent;[^}]*border-color:\s*transparent;/s);
+    assert.match(layoutCss, /\.window-command[^{]*\{[^}]*width:\s*40px;[^}]*height:\s*100%;/s);
+    assert.match(layoutCss, /\.minimize-icon::before[^{]*\{[^}]*top:\s*6px;[^}]*height:\s*1\.5px;/s);
+  });
 });
