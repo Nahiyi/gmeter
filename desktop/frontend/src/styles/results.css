@@ -263,9 +263,10 @@
 
 .trace-table-row {
   display: grid;
-  grid-template-columns: 60px 54px 62px 70px 76px minmax(180px, 1fr);
+  grid-template-columns: 60px 54px 62px 70px 76px minmax(130px, 0.7fr) minmax(180px, 1fr);
   align-items: center;
   width: 100%;
+  min-width: 760px;
   min-height: 32px;
   border: none;
   border-bottom: 1px solid #edf0f3;

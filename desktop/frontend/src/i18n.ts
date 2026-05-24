@@ -23,6 +23,26 @@ export type I18nKey =
   | "theme.light"
   | "theme.dark"
   | "nav.runSetup"
+  | "plan.navigator"
+  | "plan.addGroup"
+  | "plan.addItem"
+  | "plan.deleteGroup"
+  | "plan.deleteItem"
+  | "plan.confirmDeleteGroup"
+  | "plan.confirmDeleteItem"
+  | "plan.keepOneGroup"
+  | "plan.execution"
+  | "plan.groupName"
+  | "plan.itemName"
+  | "plan.groupItems"
+  | "plan.emptyGroup"
+  | "plan.emptyUrl"
+  | "plan.serialGroup"
+  | "plan.selectedTarget"
+  | "plan.targetGroup"
+  | "plan.targetItem"
+  | "plan.groups"
+  | "plan.items"
   | "setup.threads"
   | "setup.rampUp"
   | "setup.loops"
@@ -118,6 +138,7 @@ export type I18nKey =
   | "results.sortStatusAsc"
   | "results.thread"
   | "results.loop"
+  | "results.target"
   | "results.request"
   | "results.method"
   | "results.url"
@@ -172,6 +193,26 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "theme.light": "Light",
     "theme.dark": "Dark",
     "nav.runSetup": "Run Setup",
+    "plan.navigator": "Test Plan",
+    "plan.addGroup": "New Group",
+    "plan.addItem": "New Item",
+    "plan.deleteGroup": "Delete group",
+    "plan.deleteItem": "Delete item",
+    "plan.confirmDeleteGroup": "Delete this group and all of its test items?",
+    "plan.confirmDeleteItem": "Delete this test item?",
+    "plan.keepOneGroup": "At least one group is required",
+    "plan.execution": "Execution",
+    "plan.groupName": "Group Name",
+    "plan.itemName": "Item Name",
+    "plan.groupItems": "Group Items",
+    "plan.emptyGroup": "No test items in this group.",
+    "plan.emptyUrl": "No URL configured",
+    "plan.serialGroup": "Serial group run",
+    "plan.selectedTarget": "Selected Target",
+    "plan.targetGroup": "Group",
+    "plan.targetItem": "Item",
+    "plan.groups": "Groups",
+    "plan.items": "Items",
     "setup.threads": "Threads",
     "setup.rampUp": "Ramp-Up Seconds",
     "setup.loops": "Loops Per Thread",
@@ -267,6 +308,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.sortStatusAsc": "Status",
     "results.thread": "Thread",
     "results.loop": "Loop",
+    "results.target": "Target",
     "results.request": "Request",
     "results.method": "Method",
     "results.url": "URL",
@@ -320,6 +362,26 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "theme.light": "亮色",
     "theme.dark": "暗色",
     "nav.runSetup": "运行配置",
+    "plan.navigator": "测试计划",
+    "plan.addGroup": "新建组",
+    "plan.addItem": "新建测试项",
+    "plan.deleteGroup": "删除组",
+    "plan.deleteItem": "删除测试项",
+    "plan.confirmDeleteGroup": "确定删除该组及其全部测试项吗？",
+    "plan.confirmDeleteItem": "确定删除该测试项吗？",
+    "plan.keepOneGroup": "至少需要保留一个组",
+    "plan.execution": "执行配置",
+    "plan.groupName": "组名称",
+    "plan.itemName": "测试项名称",
+    "plan.groupItems": "组内测试项",
+    "plan.emptyGroup": "该组暂无测试项。",
+    "plan.emptyUrl": "未配置 URL",
+    "plan.serialGroup": "组内串行运行",
+    "plan.selectedTarget": "当前目标",
+    "plan.targetGroup": "组",
+    "plan.targetItem": "测试项",
+    "plan.groups": "组",
+    "plan.items": "测试项",
     "setup.threads": "线程数",
     "setup.rampUp": "Ramp-Up 秒数",
     "setup.loops": "每线程循环",
@@ -415,6 +477,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.sortStatusAsc": "按状态",
     "results.thread": "线程",
     "results.loop": "循环",
+    "results.target": "目标",
     "results.request": "请求",
     "results.method": "方法",
     "results.url": "URL",

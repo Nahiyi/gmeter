@@ -82,6 +82,7 @@ export function ResultsWorkbench(props: {
               <span>{props.t("results.method")}</span>
               <span>{props.t("trace.status")}</span>
               <span>{props.t("results.latency")}</span>
+              <span>{props.t("results.target")}</span>
               <span>{props.t("results.url")}</span>
             </div>
             {props.filteredTraces.length === 0 ? (
@@ -100,6 +101,7 @@ export function ResultsWorkbench(props: {
                   <span>{trace.method}</span>
                   <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
                   <span>{trace.responseTimeMs}ms</span>
+                  <span className="url-cell">{traceTarget(trace) || "-"}</span>
                   <span className="url-cell">{trace.url}</span>
                 </button>
               ))
@@ -252,6 +254,8 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
           <strong>L{props.trace.loopIndex}</strong>
           <span>{props.t("results.request")}</span>
           <strong>#{props.trace.requestIndex}</strong>
+          <span>{props.t("results.target")}</span>
+          <strong>{traceTarget(props.trace) || "-"}</strong>
           <span>{props.t("trace.status")}</span>
           <strong className={props.trace.success ? "ok" : "bad"}>{props.trace.responseStatus || "ERR"}</strong>
           <span>{props.t("results.latency")}</span>
@@ -276,4 +280,10 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
       </div>
     </section>
   );
+}
+
+function traceTarget(trace: desktop.TraceDTO) {
+  const workbenchTrace = trace as desktop.TraceDTO & { groupName?: string; itemName?: string };
+  if (workbenchTrace.groupName && workbenchTrace.itemName) return `${workbenchTrace.groupName} / ${workbenchTrace.itemName}`;
+  return workbenchTrace.itemName ?? workbenchTrace.groupName ?? "";
 }

@@ -1,4 +1,4 @@
-import type { HeaderRow } from "../types/config";
+import type { HeaderRow } from "../types/config.js";
 
 export function createID() {
   return Math.random().toString(36).slice(2);

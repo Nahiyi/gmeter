@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { I18nKey } from "../../i18n";
 import type { HeaderRow, UserRow } from "../../types/config";
 import { HeaderEditor } from "./HeaderEditor";
@@ -8,6 +9,7 @@ export function ConfigEditor(props: {
   configText: string;
   method: string;
   requestHeaders: HeaderRow[];
+  header?: ReactNode;
   setBody: (body: string) => void;
   setMethod: (method: string) => void;
   setRequestHeaders: (rows: HeaderRow[]) => void;
@@ -18,7 +20,8 @@ export function ConfigEditor(props: {
   users: UserRow[];
 }) {
   return (
-    <div className="request-form">
+    <div className={`request-form ${props.header ? "request-form-with-target" : ""}`}>
+      {props.header}
       <div className="request-line">
         <label>
           {props.t("request.method")}
