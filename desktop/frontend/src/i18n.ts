@@ -92,6 +92,8 @@ export type I18nKey =
   | "summary.avg"
   | "summary.p90"
   | "summary.p99"
+  | "summary.liveSignals"
+  | "summary.eventConsole"
   | "trace.recent"
   | "trace.empty"
   | "trace.detail"
@@ -124,9 +126,13 @@ export type I18nKey =
   | "results.diagnosticsStatusMix"
   | "results.diagnosticsNoData"
   | "results.totalTraces"
+  | "results.successRate"
   | "results.failedTraces"
   | "results.slowest"
   | "results.failureRate"
+  | "results.avgLatency"
+  | "results.p90Latency"
+  | "results.p99Latency"
   | "results.filter"
   | "results.filterAll"
   | "results.filterFailed"
@@ -148,6 +154,12 @@ export type I18nKey =
   | "results.method"
   | "results.url"
   | "results.latency"
+  | "results.outcome"
+  | "results.errorBrief"
+  | "results.traceSummary"
+  | "results.bodySize"
+  | "results.ok"
+  | "results.noError"
   | "results.noMatches"
   | "results.requestEvidence"
   | "results.responseEvidence"
@@ -267,6 +279,8 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "summary.avg": "Avg",
     "summary.p90": "P90",
     "summary.p99": "P99",
+    "summary.liveSignals": "Live Signals",
+    "summary.eventConsole": "Event Console",
     "trace.recent": "Recent Traces",
     "trace.empty": "No request traces yet.",
     "trace.detail": "Trace Detail",
@@ -299,9 +313,13 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.diagnosticsStatusMix": "Dominant status",
     "results.diagnosticsNoData": "Recent sample data has not been captured yet.",
     "results.totalTraces": "Sample Traces",
+    "results.successRate": "Success Rate",
     "results.failedTraces": "Sample Failed",
     "results.slowest": "Sample Slowest",
     "results.failureRate": "Sample Failure Rate",
+    "results.avgLatency": "Avg Latency",
+    "results.p90Latency": "P90 Latency",
+    "results.p99Latency": "P99 Latency",
     "results.filter": "Filter",
     "results.filterAll": "All",
     "results.filterFailed": "Failed",
@@ -323,6 +341,12 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.method": "Method",
     "results.url": "URL",
     "results.latency": "Latency",
+    "results.outcome": "Outcome",
+    "results.errorBrief": "Error Brief",
+    "results.traceSummary": "Trace Summary",
+    "results.bodySize": "Body Size",
+    "results.ok": "OK",
+    "results.noError": "No error captured",
     "results.noMatches": "No traces match the current filters.",
     "results.requestEvidence": "Request Evidence",
     "results.responseEvidence": "Response Evidence",
@@ -441,6 +465,8 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "summary.avg": "平均",
     "summary.p90": "P90",
     "summary.p99": "P99",
+    "summary.liveSignals": "实时信号",
+    "summary.eventConsole": "事件日志",
     "trace.recent": "最近请求",
     "trace.empty": "暂无请求记录。",
     "trace.detail": "请求详情",
@@ -473,9 +499,13 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.diagnosticsStatusMix": "主要状态",
     "results.diagnosticsNoData": "尚未捕获最近样本数据。",
     "results.totalTraces": "样本记录",
+    "results.successRate": "成功率",
     "results.failedTraces": "样本失败",
     "results.slowest": "样本最慢",
     "results.failureRate": "样本失败率",
+    "results.avgLatency": "平均耗时",
+    "results.p90Latency": "P90 耗时",
+    "results.p99Latency": "P99 耗时",
     "results.filter": "筛选",
     "results.filterAll": "全部",
     "results.filterFailed": "失败",
@@ -497,6 +527,12 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "results.method": "方法",
     "results.url": "URL",
     "results.latency": "耗时",
+    "results.outcome": "结果",
+    "results.errorBrief": "错误简述",
+    "results.traceSummary": "请求摘要",
+    "results.bodySize": "响应体大小",
+    "results.ok": "成功",
+    "results.noError": "未捕获错误",
     "results.noMatches": "没有符合当前筛选条件的请求记录。",
     "results.requestEvidence": "请求证据",
     "results.responseEvidence": "响应证据",

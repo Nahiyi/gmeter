@@ -9,9 +9,18 @@
   overflow: hidden;
 }
 
+.results-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.44fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .results-kpis {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
   max-width: 100%;
@@ -45,6 +54,29 @@
 
 .result-kpi.bad strong {
   color: #bd3838;
+}
+
+.latency-summary-panel {
+  min-width: 0;
+  border: 1px solid #c5cbd2;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.latency-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 10px;
+  padding: 9px 10px;
+  color: #566171;
+  font-size: 12px;
+}
+
+.latency-summary-grid strong {
+  color: #1d232a;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .diagnostics-strip {
@@ -263,10 +295,10 @@
 
 .trace-table-row {
   display: grid;
-  grid-template-columns: 60px 54px 62px 70px 76px minmax(130px, 0.7fr) minmax(180px, 1fr);
+  grid-template-columns: 58px 52px 58px 62px 68px 76px 78px minmax(130px, 0.7fr) minmax(180px, 1fr) minmax(160px, 0.9fr);
   align-items: center;
   width: 100%;
-  min-width: 760px;
+  min-width: 980px;
   min-height: 32px;
   border: none;
   border-bottom: 1px solid #edf0f3;
@@ -318,6 +350,33 @@ button.trace-table-row.selected {
   overflow: auto;
 }
 
+.trace-inspector-summary {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 7px 10px;
+  border-bottom: 1px solid #edf0f3;
+  background: #fbfcfd;
+  padding: 10px;
+  color: #566171;
+  font-size: 12px;
+}
+
+.trace-inspector-summary strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #1d232a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trace-inspector-summary strong.ok {
+  color: #226947;
+}
+
+.trace-inspector-summary strong.bad {
+  color: #bd3838;
+}
+
 .inspector-grid {
   display: grid;
   grid-template-columns: 86px 1fr;
@@ -346,6 +405,10 @@ button.trace-table-row.selected {
   border-top: 1px solid #edf0f3;
 }
 
+.evidence-grid {
+  background: #ffffff;
+}
+
 .response-evidence {
   min-height: 160px;
 }
@@ -371,6 +434,10 @@ button.trace-table-row.selected {
 }
 
 @media (max-width: 1280px) {
+  .results-overview {
+    grid-template-columns: 1fr;
+  }
+
   .trace-toolbar {
     grid-template-columns: max-content minmax(160px, 1fr) 120px 120px 120px;
   }

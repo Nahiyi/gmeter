@@ -34,29 +34,33 @@ export function RunSummaryPanel(props: {
         </div>
       </div>
 
-      <div className="metric-grid">
+      <section className="signal-board" aria-label={props.t("summary.liveSignals")}>
+        <div className="trace-heading">{props.t("summary.liveSignals")}</div>
         {props.metrics.map(([label, value]) => (
-          <div className="metric" key={label}>
+          <div className="signal-row" key={label}>
             <span>{label}</span>
             <strong>{value}</strong>
           </div>
         ))}
-      </div>
+      </section>
 
-      <div className="console">
-        {props.consoleLines.map((line, index) => (
-          <div className={index === 0 ? "console-line" : "console-line muted"} key={`${line}-${index}`}>
-            {line}
-          </div>
-        ))}
-      </div>
+      <section className="console-panel">
+        <div className="trace-heading">{props.t("summary.eventConsole")}</div>
+        <div className="console">
+          {props.consoleLines.map((line, index) => (
+            <div className={index === 0 ? "console-line" : "console-line muted"} key={`${line}-${index}`}>
+              {line}
+            </div>
+          ))}
+        </div>
+      </section>
       <div className="trace-list">
         <div className="trace-heading">{props.t("trace.recent")}</div>
         {props.recentTraces.length === 0 ? (
           <div className="trace-empty">{props.t("trace.empty")}</div>
         ) : (
           props.recentTraces.slice(0, 8).map((trace, index) => (
-            <button className="trace-row" type="button" onClick={() => props.setSelectedTrace(trace)} key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
+            <button className={`trace-row ${isSelectedTrace(trace, props.selectedTrace) ? "selected" : ""}`} type="button" onClick={() => props.setSelectedTrace(trace)} key={`${trace.threadId}-${trace.loopIndex}-${trace.requestIndex}-${index}`}>
               <span>T{trace.threadId} / L{trace.loopIndex}</span>
               <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
               <span>{trace.responseTimeMs}ms</span>
@@ -66,4 +70,12 @@ export function RunSummaryPanel(props: {
       </div>
     </aside>
   );
+}
+
+function isSelectedTrace(trace: desktop.TraceDTO, selectedTrace: desktop.TraceDTO | null) {
+  if (!selectedTrace) return false;
+  return trace.threadId === selectedTrace.threadId
+    && trace.loopIndex === selectedTrace.loopIndex
+    && trace.requestIndex === selectedTrace.requestIndex
+    && trace.url === selectedTrace.url;
 }

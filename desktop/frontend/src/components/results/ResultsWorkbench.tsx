@@ -24,12 +24,27 @@ export function ResultsWorkbench(props: {
 }) {
   return (
     <div className="results-workbench">
-      <div className="results-kpis">
-        <ResultKPI label={props.t("results.totalTraces")} value={String(props.resultStats.total)} />
-        <ResultKPI label={props.t("results.failedTraces")} value={String(props.resultStats.failed)} tone={props.resultStats.failed > 0 ? "bad" : undefined} />
-        <ResultKPI label={props.t("results.slowest")} value={props.resultStats.slowest ? `${props.resultStats.slowest.responseTimeMs} ms` : "-- ms"} />
-        <ResultKPI label={props.t("results.failureRate")} value={`${props.resultStats.failureRate.toFixed(1)}%`} tone={props.resultStats.failureRate > 0 ? "bad" : undefined} />
-      </div>
+      <section className="results-overview">
+        <div className="results-kpis">
+          <ResultKPI label={props.t("results.totalTraces")} value={String(props.resultStats.total)} />
+          <ResultKPI label={props.t("results.successRate")} value={`${props.resultStats.successRate.toFixed(1)}%`} />
+          <ResultKPI label={props.t("results.failedTraces")} value={String(props.resultStats.failed)} tone={props.resultStats.failed > 0 ? "bad" : undefined} />
+          <ResultKPI label={props.t("results.failureRate")} value={`${props.resultStats.failureRate.toFixed(1)}%`} tone={props.resultStats.failureRate > 0 ? "bad" : undefined} />
+        </div>
+        <div className="latency-summary-panel">
+          <div className="trace-heading">{props.t("results.traceSummary")}</div>
+          <div className="latency-summary-grid">
+            <span>{props.t("results.avgLatency")}</span>
+            <strong>{formatLatency(props.resultStats.avgLatencyMs)}</strong>
+            <span>{props.t("results.p90Latency")}</span>
+            <strong>{formatLatency(props.resultStats.p90LatencyMs)}</strong>
+            <span>{props.t("results.p99Latency")}</span>
+            <strong>{formatLatency(props.resultStats.p99LatencyMs)}</strong>
+            <span>{props.t("results.slowest")}</span>
+            <strong>{props.resultStats.slowest ? formatLatency(props.resultStats.slowest.responseTimeMs) : "-- ms"}</strong>
+          </div>
+        </div>
+      </section>
 
       <DiagnosticsSummary resultStats={props.resultStats} t={props.t} />
 
@@ -79,11 +94,14 @@ export function ResultsWorkbench(props: {
             <div className="trace-table-row trace-table-head" role="row">
               <span>{props.t("results.thread")}</span>
               <span>{props.t("results.loop")}</span>
+              <span>{props.t("results.request")}</span>
               <span>{props.t("results.method")}</span>
               <span>{props.t("trace.status")}</span>
               <span>{props.t("results.latency")}</span>
+              <span>{props.t("results.outcome")}</span>
               <span>{props.t("results.target")}</span>
               <span>{props.t("results.url")}</span>
+              <span>{props.t("results.errorBrief")}</span>
             </div>
             {props.filteredTraces.length === 0 ? (
               <div className="trace-empty">{props.recentTraces.length === 0 ? props.t("results.empty") : props.t("results.noMatches")}</div>
@@ -98,11 +116,14 @@ export function ResultsWorkbench(props: {
                 >
                   <span>T{trace.threadId}</span>
                   <span>L{trace.loopIndex}</span>
+                  <span>#{trace.requestIndex}</span>
                   <span>{trace.method}</span>
                   <strong className={trace.success ? "ok" : "bad"}>{trace.responseStatus || "ERR"}</strong>
-                  <span>{trace.responseTimeMs}ms</span>
+                  <span>{formatLatency(trace.responseTimeMs)}</span>
+                  <span>{traceOutcome(trace, props.t)}</span>
                   <span className="url-cell">{traceTarget(trace) || "-"}</span>
                   <span className="url-cell">{trace.url}</span>
+                  <span className="url-cell">{traceErrorBrief(trace, props.t)}</span>
                 </button>
               ))
             )}
@@ -150,6 +171,10 @@ function ResultKPI(props: { label: string; value: string; tone?: "bad" }) {
       <strong>{props.value}</strong>
     </div>
   );
+}
+
+function formatLatency(value: number) {
+  return `${value.toFixed(value % 1 === 0 ? 0 : 1)} ms`;
 }
 
 function GroupSummary(props: { title: string; groups: ResultGroup[]; t: (key: I18nKey) => string }) {
@@ -247,6 +272,14 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
     <section className="trace-inspector">
       <div className="trace-heading">{props.t("results.traceInspector")}</div>
       <div className="trace-inspector-body">
+        <div className="trace-inspector-summary">
+          <span>{props.t("results.traceSummary")}</span>
+          <strong>{`T${props.trace.threadId} / L${props.trace.loopIndex} / #${props.trace.requestIndex}`}</strong>
+          <span>{props.t("results.outcome")}</span>
+          <strong className={props.trace.success ? "ok" : "bad"}>{traceOutcome(props.trace, props.t)}</strong>
+          <span>{props.t("results.bodySize")}</span>
+          <strong>{bodySizeLabel(props.trace.responseBody)}</strong>
+        </div>
         <div className="inspector-grid">
           <span>{props.t("results.thread")}</span>
           <strong>T{props.trace.threadId}</strong>
@@ -261,7 +294,7 @@ function TraceInspector(props: { trace: desktop.TraceDTO | null; t: (key: I18nKe
           <span>{props.t("results.latency")}</span>
           <strong>{props.trace.responseTimeMs}ms</strong>
         </div>
-        <div className="evidence-block">
+        <div className="evidence-block evidence-grid">
           <div className="trace-heading small">{props.t("results.requestEvidence")}</div>
           <div className="evidence-line"><span>{props.t("results.method")}</span><strong>{props.trace.method}</strong></div>
           <div className="evidence-line"><span>{props.t("results.url")}</span><strong>{props.trace.url}</strong></div>
@@ -286,4 +319,19 @@ function traceTarget(trace: desktop.TraceDTO) {
   const workbenchTrace = trace as desktop.TraceDTO & { groupName?: string; itemName?: string };
   if (workbenchTrace.groupName && workbenchTrace.itemName) return `${workbenchTrace.groupName} / ${workbenchTrace.itemName}`;
   return workbenchTrace.itemName ?? workbenchTrace.groupName ?? "";
+}
+
+function traceOutcome(trace: desktop.TraceDTO, t: (key: I18nKey) => string) {
+  if (trace.success) return t("results.ok");
+  return trace.error ? t("trace.error") : `HTTP ${trace.responseStatus || "ERR"}`;
+}
+
+function traceErrorBrief(trace: desktop.TraceDTO, t: (key: I18nKey) => string) {
+  if (trace.error) return trace.error;
+  if (!trace.success) return `HTTP ${trace.responseStatus || "ERR"}`;
+  return t("results.noError");
+}
+
+function bodySizeLabel(body: string) {
+  return `${new Blob([body ?? ""]).size} B`;
 }

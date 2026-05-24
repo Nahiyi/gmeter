@@ -50,8 +50,13 @@ describe("buildResultStats", () => {
     const stats = buildResultStats(traces);
 
     assert.equal(stats.total, 3);
+    assert.equal(stats.success, 2);
     assert.equal(stats.failed, 1);
+    assert.equal(stats.successRate.toFixed(1), "66.7");
     assert.equal(stats.failureRate.toFixed(1), "33.3");
+    assert.equal(stats.avgLatencyMs.toFixed(1), "521.3");
+    assert.equal(stats.p90LatencyMs, 1200);
+    assert.equal(stats.p99LatencyMs, 1200);
     assert.equal(stats.slowest?.url, "https://example.com/slow");
     assert.deepEqual(stats.statusGroups.map((group) => [group.label, group.count]), [["200", 2], ["503", 1]]);
     assert.deepEqual(stats.errorGroups.map((group) => [group.label, group.count]), [["upstream unavailable", 1]]);

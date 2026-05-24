@@ -38,8 +38,13 @@ export type LatencyBucket = {
 
 export type ResultStats = {
   total: number;
+  success: number;
   failed: number;
+  successRate: number;
   failureRate: number;
+  avgLatencyMs: number;
+  p90LatencyMs: number;
+  p99LatencyMs: number;
   slowest: TraceDTO | null;
   errorGroups: ResultGroup[];
   statusGroups: ResultGroup[];
@@ -48,6 +53,8 @@ export type ResultStats = {
 };
 
 export function buildResultStats(traces: TraceDTO[]): ResultStats {
+  const latencies = traces.map((trace) => trace.responseTimeMs).sort((a, b) => a - b);
+  const success = traces.filter((trace) => trace.success).length;
   const failed = traces.filter((trace) => !trace.success).length;
   const slowest = traces.reduce<TraceDTO | null>((current, trace) => {
     if (!current || trace.responseTimeMs > current.responseTimeMs) {
@@ -58,14 +65,25 @@ export function buildResultStats(traces: TraceDTO[]): ResultStats {
 
   return {
     total: traces.length,
+    success,
     failed,
+    successRate: traces.length === 0 ? 0 : (success / traces.length) * 100,
     failureRate: traces.length === 0 ? 0 : (failed / traces.length) * 100,
+    avgLatencyMs: latencies.length === 0 ? 0 : latencies.reduce((sum, value) => sum + value, 0) / latencies.length,
+    p90LatencyMs: percentile(latencies, 0.9),
+    p99LatencyMs: percentile(latencies, 0.99),
     slowest,
     errorGroups: groupTraces(traces.filter((trace) => !trace.success), (trace) => trace.error || `HTTP ${trace.responseStatus || "ERR"}`),
     statusGroups: groupTraces(traces, (trace) => String(trace.responseStatus || "ERR")),
     latencyBuckets: buildLatencyBuckets(traces),
     slowestTraces: [...traces].sort((a, b) => b.responseTimeMs - a.responseTimeMs).slice(0, 5)
   };
+}
+
+function percentile(sortedValues: number[], percentileRank: number) {
+  if (sortedValues.length === 0) return 0;
+  const index = Math.min(sortedValues.length - 1, Math.ceil(sortedValues.length * percentileRank) - 1);
+  return sortedValues[index];
 }
 
 export function filterTraces(traces: TraceDTO[], filter: TraceFilter, search: string, status: string) {

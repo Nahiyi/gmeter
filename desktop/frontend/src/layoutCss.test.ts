@@ -10,6 +10,8 @@ const summaryCss = readFileSync(new URL("../src/styles/summary.css", import.meta
 const appTsx = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const runSetupPanelTsx = readFileSync(new URL("../src/components/RunSetupPanel.tsx", import.meta.url), "utf8");
 const titlebarTsx = readFileSync(new URL("../src/components/Titlebar.tsx", import.meta.url), "utf8");
+const resultsWorkbenchTsx = readFileSync(new URL("../src/components/results/ResultsWorkbench.tsx", import.meta.url), "utf8");
+const runSummaryPanelTsx = readFileSync(new URL("../src/components/RunSummaryPanel.tsx", import.meta.url), "utf8");
 
 describe("results workbench layout css", () => {
   it("keeps trace filter labels horizontal in narrow windows", () => {
@@ -87,6 +89,27 @@ describe("results workbench layout css", () => {
     assert.match(configCss, /\.folder-icon::before[^{]*\{[^}]*box-sizing:\s*border-box;[^}]*top:\s*4px;[^}]*width:\s*13px;[^}]*height:\s*8px;/s);
     assert.match(configCss, /\.folder-icon::after[^{]*\{[^}]*box-sizing:\s*border-box;[^}]*top:\s*1px;[^}]*width:\s*7px;[^}]*border-bottom:\s*none;/s);
     assert.match(configCss, /\.item-icon[^{]*\{[^}]*border:\s*1\.5px solid currentColor;/s);
+  });
+
+  it("keeps result analysis in the center and live signals in the right rail", () => {
+    assert.match(resultsWorkbenchTsx, /results\.successRate/s);
+    assert.match(resultsWorkbenchTsx, /results\.avgLatency/s);
+    assert.match(resultsWorkbenchTsx, /results\.p90Latency/s);
+    assert.match(resultsWorkbenchTsx, /results\.p99Latency/s);
+    assert.match(resultsWorkbenchTsx, /results\.outcome/s);
+    assert.match(resultsWorkbenchTsx, /results\.errorBrief/s);
+    assert.match(resultsWorkbenchTsx, /className="trace-inspector-summary"/s);
+    assert.match(resultsWorkbenchTsx, /className="[^"]*evidence-grid/s);
+    assert.match(resultsCss, /\.trace-table-row[^{]*\{[^}]*min-width:\s*980px;/s);
+    assert.match(resultsCss, /\.trace-inspector-summary[^{]*\{/s);
+    assert.match(resultsCss, /\.evidence-grid[^{]*\{/s);
+    assert.doesNotMatch(runSummaryPanelTsx, /className="metric-grid"/s);
+    assert.match(runSummaryPanelTsx, /className="signal-board"/s);
+    assert.match(runSummaryPanelTsx, /summary\.liveSignals/s);
+    assert.match(summaryCss, /\.signal-board[^{]*\{/s);
+    assert.match(summaryCss, /\.console-panel[^{]*\{/s);
+    assert.match(baseCss, /html\[data-theme="dark"\] \.latency-summary-panel/s);
+    assert.match(baseCss, /html\[data-theme="dark"\] \.signal-board/s);
   });
 
   it("supports dark theme and blocks browser-style zoom gestures", () => {

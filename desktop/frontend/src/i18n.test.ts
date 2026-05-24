@@ -9,6 +9,17 @@ describe("result workbench labels", () => {
     assert.match(translate("en", "results.mode"), /sample/);
     assert.match(translate("zh", "results.mode"), /样本/);
   });
+
+  it("provides labels for richer analysis and right rail live signals", () => {
+    assert.equal(translate("en", "results.successRate"), "Success Rate");
+    assert.equal(translate("zh", "results.successRate"), "成功率");
+    assert.equal(translate("en", "results.outcome"), "Outcome");
+    assert.equal(translate("zh", "results.outcome"), "结果");
+    assert.equal(translate("en", "results.ok"), "OK");
+    assert.equal(translate("zh", "results.ok"), "成功");
+    assert.equal(translate("en", "summary.liveSignals"), "Live Signals");
+    assert.equal(translate("zh", "summary.liveSignals"), "实时信号");
+  });
 });
 
 describe("titlebar command labels", () => {
