@@ -28,6 +28,17 @@ export type I18nKey =
   | "setup.instantRamp"
   | "setup.userProfiles"
   | "setup.timeoutBudget"
+  | "setup.mode"
+  | "setup.modeDryRun"
+  | "setup.modeLoad"
+  | "setup.requestShape"
+  | "setup.sharedHeaders"
+  | "setup.userHeaders"
+  | "setup.bodySize"
+  | "setup.userCoverage"
+  | "setup.sharedOnly"
+  | "setup.covered"
+  | "setup.missingUsers"
   | "setup.readyPlan"
   | "layout.collapsePanel"
   | "layout.expandPanel"
@@ -118,6 +129,7 @@ export type I18nKey =
   | "console.openFailed"
   | "console.exported"
   | "console.validationFailed"
+  | "console.validationPassed"
   | "console.runStarted"
   | "console.runFailed"
   | "console.stopRequested"
@@ -158,6 +170,17 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "setup.instantRamp": "Instant",
     "setup.userProfiles": "User Profiles",
     "setup.timeoutBudget": "Timeout Budget",
+    "setup.mode": "Mode",
+    "setup.modeDryRun": "Validation only",
+    "setup.modeLoad": "Load test",
+    "setup.requestShape": "Request Shape",
+    "setup.sharedHeaders": "Shared Headers",
+    "setup.userHeaders": "User Headers",
+    "setup.bodySize": "Body Size",
+    "setup.userCoverage": "User Coverage",
+    "setup.sharedOnly": "Shared only",
+    "setup.covered": "Covered",
+    "setup.missingUsers": "Needs users",
     "setup.readyPlan": "Ready to run after configuration review.",
     "layout.collapsePanel": "Collapse panel",
     "layout.expandPanel": "Expand panel",
@@ -248,6 +271,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "console.openFailed": "Open failed",
     "console.exported": "Config exported.",
     "console.validationFailed": "Validation failed",
+    "console.validationPassed": "Validation passed. No requests were sent.",
     "console.runStarted": "Run started",
     "console.runFailed": "Run failed",
     "console.stopRequested": "Stop requested.",
@@ -287,6 +311,17 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "setup.instantRamp": "立即启动",
     "setup.userProfiles": "用户配置",
     "setup.timeoutBudget": "超时预算",
+    "setup.mode": "运行模式",
+    "setup.modeDryRun": "仅验证",
+    "setup.modeLoad": "压测执行",
+    "setup.requestShape": "请求结构",
+    "setup.sharedHeaders": "公共请求头",
+    "setup.userHeaders": "用户请求头",
+    "setup.bodySize": "请求体大小",
+    "setup.userCoverage": "用户覆盖",
+    "setup.sharedOnly": "仅公共配置",
+    "setup.covered": "已覆盖",
+    "setup.missingUsers": "缺少用户",
     "setup.readyPlan": "配置检查后即可运行。",
     "layout.collapsePanel": "折叠面板",
     "layout.expandPanel": "展开面板",
@@ -377,6 +412,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "console.openFailed": "打开失败",
     "console.exported": "配置已导出。",
     "console.validationFailed": "验证失败",
+    "console.validationPassed": "验证通过，未发送请求。",
     "console.runStarted": "运行已启动",
     "console.runFailed": "运行失败",
     "console.stopRequested": "已请求停止。",

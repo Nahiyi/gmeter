@@ -42,6 +42,7 @@ function App() {
   const [rampUpSeconds, setRampUpSeconds] = useState(0);
   const [loops, setLoops] = useState(1);
   const [requestTimeoutMs, setRequestTimeoutMs] = useState(5000);
+  const [dryRun, setDryRun] = useState(false);
   const [method, setMethod] = useState(defaultRequest.method);
   const [url, setURL] = useState(defaultRequest.url);
   const [requestHeaders, setRequestHeaders] = useState(rowsFromHeaders(defaultRequest.headers ?? {}));
@@ -103,6 +104,12 @@ function App() {
   const recentTraces = snapshot?.recentTraces ?? [];
   const isRunning = snapshot?.status === "running";
   const resultStats = useMemo(() => buildResultStats(recentTraces), [recentTraces]);
+  const requestHeaderCount = useMemo(() => requestHeaders.filter((header) => header.key.trim()).length, [requestHeaders]);
+  const userHeaderCount = useMemo(
+    () => users.reduce((total, user) => total + user.headers.filter((header) => header.key.trim()).length, 0),
+    [users]
+  );
+  const bodyBytes = useMemo(() => new Blob([body]).size, [body]);
   const statusOptions = useMemo(() => {
     const statuses = new Set(recentTraces.map((trace) => String(trace.responseStatus || "ERR")));
     return Array.from(statuses).sort((a, b) => a.localeCompare(b));
@@ -149,7 +156,8 @@ function App() {
       loops,
       rampUpSeconds,
       requestTimeoutMs,
-      maxDurationSec: 0
+      maxDurationSec: 0,
+      dryRun
     };
   }
 
@@ -162,6 +170,12 @@ function App() {
       if (validation) {
         setStatusKey("status.invalid");
         appendConsole(`${t("console.validationFailed")}: ${validation}`);
+        return;
+      }
+      if (dryRun) {
+        await StartRun(plan, runOptions());
+        setStatusKey("status.complete");
+        appendConsole(t("console.validationPassed"));
         return;
       }
 
@@ -245,12 +259,17 @@ function App() {
 
       <section className={`workspace ${isSetupCollapsed ? "setup-collapsed" : ""} ${isSummaryCollapsed ? "summary-collapsed" : ""}`}>
         <RunSetupPanel
+          bodyBytes={bodyBytes}
+          dryRun={dryRun}
           isCollapsed={isSetupCollapsed}
           loops={loops}
           rampUpSeconds={rampUpSeconds}
+          requestHeaderCount={requestHeaderCount}
+          requestMethod={method}
           requestTimeoutMs={requestTimeoutMs}
           requestURL={url}
           setCollapsed={setIsSetupCollapsed}
+          setDryRun={setDryRun}
           setLoops={setLoops}
           setRampUpSeconds={setRampUpSeconds}
           setRequestTimeoutMs={setRequestTimeoutMs}
@@ -258,6 +277,7 @@ function App() {
           status={status}
           t={t}
           threads={threads}
+          userHeaderCount={userHeaderCount}
           usersCount={users.length}
         />
 

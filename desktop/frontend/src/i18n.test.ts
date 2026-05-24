@@ -30,5 +30,9 @@ describe("run setup side panel labels", () => {
     assert.equal(translate("zh", "setup.totalRequests"), "计划请求数");
     assert.equal(translate("en", "setup.instantRamp"), "Instant");
     assert.equal(translate("zh", "setup.instantRamp"), "立即启动");
+    assert.equal(translate("en", "setup.mode"), "Mode");
+    assert.equal(translate("zh", "setup.mode"), "运行模式");
+    assert.equal(translate("en", "setup.requestShape"), "Request Shape");
+    assert.equal(translate("zh", "setup.requestShape"), "请求结构");
   });
 });

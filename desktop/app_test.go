@@ -83,6 +83,38 @@ func TestStartRunReturnsRunIDAndSnapshot(t *testing.T) {
 	}
 }
 
+func TestStartRunDryRunOnlyValidates(t *testing.T) {
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	app := NewApp()
+	plan := engine.TestPlan{Request: engine.RequestSpec{Method: "GET", URL: server.URL}}
+	options := DesktopRunOptions{Threads: 1, Loops: 3, RequestTimeoutMs: 1000, DryRun: true}
+
+	runID, err := app.StartRun(plan, options)
+	if err != nil {
+		t.Fatalf("StartRun dry run failed: %v", err)
+	}
+	if runID == "" {
+		t.Fatal("expected dry run id")
+	}
+	if requests != 0 {
+		t.Fatalf("dry run should not send requests, got %d", requests)
+	}
+
+	snapshot := app.GetRunSnapshot()
+	if snapshot.Status != RunStatusCompleted {
+		t.Fatalf("expected completed dry run snapshot, got %s", snapshot.Status)
+	}
+	if snapshot.TraceCount != 0 || snapshot.Summary.TotalRequests != 0 {
+		t.Fatalf("expected dry run to keep request counts at zero, got traceCount=%d totalRequests=%d", snapshot.TraceCount, snapshot.Summary.TotalRequests)
+	}
+}
+
 func TestStopRunCancelsActiveRun(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(200 * time.Millisecond)

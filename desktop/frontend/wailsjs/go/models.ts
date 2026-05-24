@@ -6,6 +6,7 @@ export namespace desktop {
 	    rampUpSeconds: number;
 	    requestTimeoutMs: number;
 	    maxDurationSec: number;
+	    dryRun: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new DesktopRunOptions(source);
@@ -18,6 +19,7 @@ export namespace desktop {
 	        this.rampUpSeconds = source["rampUpSeconds"];
 	        this.requestTimeoutMs = source["requestTimeoutMs"];
 	        this.maxDurationSec = source["maxDurationSec"];
+	        this.dryRun = source["dryRun"];
 	    }
 	}
 	export class TraceDTO {

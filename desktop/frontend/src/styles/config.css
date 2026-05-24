@@ -38,9 +38,17 @@
   font-size: 12px;
 }
 
+.setup-detail-grid {
+  background: #fbfcfd;
+}
+
 .setup-summary-grid strong {
+  min-width: 0;
+  overflow: hidden;
   color: #1d232a;
   text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .setup-url {

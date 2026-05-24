@@ -47,6 +47,23 @@ func (a *App) StartRun(plan engine.TestPlan, options DesktopRunOptions) (string,
 	if err := engine.Validate(plan, options.toEngineOptions()); err != nil {
 		return "", err
 	}
+	if options.DryRun {
+		runID := fmt.Sprintf("dry-run-%d", time.Now().UnixNano())
+		now := time.Now().Format(time.RFC3339)
+		a.mu.Lock()
+		a.snapshot = RunSnapshot{
+			RunID:      runID,
+			Status:     RunStatusCompleted,
+			StartedAt:  now,
+			FinishedAt: now,
+			Message:    "Validation completed",
+		}
+		a.result = nil
+		snapshot := a.snapshot
+		a.mu.Unlock()
+		a.emit("gmeter:run:snapshot", snapshot)
+		return runID, nil
+	}
 
 	a.mu.Lock()
 	if a.cancel != nil {
@@ -126,11 +143,12 @@ func (a *App) ExportLastReport(path string) error {
 // DesktopRunOptions is frontend-friendly because Wails bindings handle numbers
 // more predictably than time.Duration.
 type DesktopRunOptions struct {
-	Threads          int `json:"threads"`
-	Loops            int `json:"loops"`
-	RampUpSeconds    int `json:"rampUpSeconds"`
-	RequestTimeoutMs int `json:"requestTimeoutMs"`
-	MaxDurationSec   int `json:"maxDurationSec"`
+	Threads          int  `json:"threads"`
+	Loops            int  `json:"loops"`
+	RampUpSeconds    int  `json:"rampUpSeconds"`
+	RequestTimeoutMs int  `json:"requestTimeoutMs"`
+	MaxDurationSec   int  `json:"maxDurationSec"`
+	DryRun           bool `json:"dryRun"`
 }
 
 func (o DesktopRunOptions) toEngineOptions() engine.RunOptions {

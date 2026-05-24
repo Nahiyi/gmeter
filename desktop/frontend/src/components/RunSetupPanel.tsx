@@ -2,12 +2,17 @@ import type { I18nKey } from "../i18n";
 import { NumberField } from "./NumberField";
 
 export function RunSetupPanel(props: {
+  bodyBytes: number;
+  dryRun: boolean;
   isCollapsed: boolean;
   loops: number;
   rampUpSeconds: number;
+  requestHeaderCount: number;
+  requestMethod: string;
   requestURL: string;
   requestTimeoutMs: number;
   setCollapsed: (value: boolean) => void;
+  setDryRun: (value: boolean) => void;
   setLoops: (value: number) => void;
   setRampUpSeconds: (value: number) => void;
   setRequestTimeoutMs: (value: number) => void;
@@ -15,10 +20,16 @@ export function RunSetupPanel(props: {
   status: string;
   t: (key: I18nKey) => string;
   threads: number;
+  userHeaderCount: number;
   usersCount: number;
 }) {
   const totalRequests = props.threads * props.loops;
   const rampRate = props.rampUpSeconds > 0 ? `${(props.threads / props.rampUpSeconds).toFixed(1)}/s` : props.t("setup.instantRamp");
+  const userCoverage = props.usersCount === 0
+    ? props.t("setup.sharedOnly")
+    : props.usersCount >= props.threads
+      ? props.t("setup.covered")
+      : `${props.t("setup.missingUsers")} ${props.usersCount}/${props.threads}`;
 
   if (props.isCollapsed) {
     return (
@@ -49,12 +60,14 @@ export function RunSetupPanel(props: {
 
       <div className="toggle-row">
         <span>{props.t("setup.dryRun")}</span>
-        <input type="checkbox" />
+        <input type="checkbox" checked={props.dryRun} onChange={(event) => props.setDryRun(event.target.checked)} />
       </div>
 
       <section className="setup-summary">
         <div className="trace-heading">{props.t("setup.planSummary")}</div>
         <div className="setup-summary-grid">
+          <span>{props.t("setup.mode")}</span>
+          <strong>{props.dryRun ? props.t("setup.modeDryRun") : props.t("setup.modeLoad")}</strong>
           <span>{props.t("setup.totalRequests")}</span>
           <strong>{totalRequests}</strong>
           <span>{props.t("setup.threadLoad")}</span>
@@ -65,6 +78,18 @@ export function RunSetupPanel(props: {
           <strong>{props.usersCount}</strong>
           <span>{props.t("setup.timeoutBudget")}</span>
           <strong>{props.requestTimeoutMs}ms</strong>
+          <span>{props.t("setup.userCoverage")}</span>
+          <strong>{userCoverage}</strong>
+        </div>
+        <div className="setup-summary-grid setup-detail-grid">
+          <span>{props.t("setup.requestShape")}</span>
+          <strong>{props.requestMethod}</strong>
+          <span>{props.t("setup.sharedHeaders")}</span>
+          <strong>{props.requestHeaderCount}</strong>
+          <span>{props.t("setup.userHeaders")}</span>
+          <strong>{props.userHeaderCount}</strong>
+          <span>{props.t("setup.bodySize")}</span>
+          <strong>{props.bodyBytes} B</strong>
         </div>
         <div className="setup-url">
           <span>URL</span>
