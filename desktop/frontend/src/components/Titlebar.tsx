@@ -1,6 +1,7 @@
 import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import { Quit, WindowMinimise, WindowToggleMaximise } from "../../wailsjs/runtime/runtime";
 import type { I18nKey, Locale } from "../i18n";
+import type { ThemePreference } from "../theme";
 
 export function Titlebar(props: {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -12,7 +13,9 @@ export function Titlebar(props: {
   onRun: () => void;
   onSave: () => void;
   onStop: () => void;
+  onThemePreferenceChange: (theme: ThemePreference) => void;
   t: (key: I18nKey) => string;
+  themePreference: ThemePreference;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -70,6 +73,14 @@ export function Titlebar(props: {
                 <select value={props.locale} onChange={(event) => props.onLocaleChange(event.target.value as Locale)}>
                   <option value="en">EN</option>
                   <option value="zh">中文</option>
+                </select>
+              </label>
+              <label className="menu-select-row">
+                <span>{props.t("command.theme")}</span>
+                <select value={props.themePreference} onChange={(event) => props.onThemePreferenceChange(event.target.value as ThemePreference)}>
+                  <option value="system">{props.t("theme.system")}</option>
+                  <option value="light">{props.t("theme.light")}</option>
+                  <option value="dark">{props.t("theme.dark")}</option>
                 </select>
               </label>
             </div>

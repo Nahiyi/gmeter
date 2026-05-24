@@ -166,3 +166,167 @@ textarea {
 .detail-pre.bad {
   color: #bd3838;
 }
+
+html[data-theme="dark"] {
+  color: #d8dee7;
+  background: #14181d;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .workspace {
+  background: #20262d;
+}
+
+html[data-theme="dark"] .titlebar,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .trace-toolbar,
+html[data-theme="dark"] .trace-heading,
+html[data-theme="dark"] .trace-table-head {
+  background: #1b2026;
+}
+
+html[data-theme="dark"] .titlebar,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .workspace,
+html[data-theme="dark"] .trace-heading,
+html[data-theme="dark"] .trace-toolbar {
+  border-color: #343c46;
+}
+
+html[data-theme="dark"] button,
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .segmented-control,
+html[data-theme="dark"] .filter-group,
+html[data-theme="dark"] .metric,
+html[data-theme="dark"] .result-kpi,
+html[data-theme="dark"] .setup-summary,
+html[data-theme="dark"] .group-summary,
+html[data-theme="dark"] .distribution-panel,
+html[data-theme="dark"] .trace-table-panel,
+html[data-theme="dark"] .trace-inspector,
+html[data-theme="dark"] .trace-list,
+html[data-theme="dark"] .diagnostics-strip,
+html[data-theme="dark"] .user-block {
+  border-color: #3b4651;
+  background: #20262d;
+  color: #d8dee7;
+}
+
+html[data-theme="dark"] .titlebar-control:hover,
+html[data-theme="dark"] .window-command:hover,
+html[data-theme="dark"] .collapse-button:hover,
+html[data-theme="dark"] .rail-toggle:hover,
+html[data-theme="dark"] .trace-row:hover,
+html[data-theme="dark"] button.trace-table-row:hover,
+html[data-theme="dark"] button.trace-table-row.selected {
+  background: #2a343e;
+}
+
+html[data-theme="dark"] button.primary {
+  border-color: #3f8a68;
+  background: #347858;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] button.danger {
+  border-color: #b84b4b;
+  background: #a83c3c;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .close-command:hover {
+  background: #c44a4a;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] label,
+html[data-theme="dark"] .titlebar-brand span,
+html[data-theme="dark"] .panel-heading span,
+html[data-theme="dark"] .metric span,
+html[data-theme="dark"] .result-kpi span,
+html[data-theme="dark"] .trace-heading,
+html[data-theme="dark"] .trace-empty,
+html[data-theme="dark"] .setup-summary-grid,
+html[data-theme="dark"] .setup-url,
+html[data-theme="dark"] .setup-summary p,
+html[data-theme="dark"] .group-row,
+html[data-theme="dark"] .bar-row,
+html[data-theme="dark"] .slow-row,
+html[data-theme="dark"] .inspector-grid,
+html[data-theme="dark"] .evidence-line {
+  color: #aeb8c4;
+}
+
+html[data-theme="dark"] .titlebar-brand strong,
+html[data-theme="dark"] .metric strong,
+html[data-theme="dark"] .result-kpi strong,
+html[data-theme="dark"] .setup-summary-grid strong,
+html[data-theme="dark"] .setup-url strong,
+html[data-theme="dark"] .slow-row strong,
+html[data-theme="dark"] .inspector-grid strong,
+html[data-theme="dark"] .evidence-line strong,
+html[data-theme="dark"] .trace-table-row,
+html[data-theme="dark"] .trace-row {
+  color: #e7edf4;
+}
+
+html[data-theme="dark"] .detail-pre,
+html[data-theme="dark"] .json-preview textarea,
+html[data-theme="dark"] .setup-detail-grid,
+html[data-theme="dark"] .diagnostics-items span,
+html[data-theme="dark"] .bar-track {
+  border-color: #343c46;
+  background: #171c22;
+  color: #d8dee7;
+}
+
+html[data-theme="dark"] .console {
+  border-color: #3b4651;
+  background: #11161b;
+  color: #dbe5ef;
+}
+
+html[data-theme="dark"] .app-menu-popover {
+  border-color: #3b4651;
+  background: #20262d;
+  box-shadow: 0 10px 22px rgb(0 0 0 / 36%);
+}
+
+html[data-theme="dark"] .app-menu-popover button:hover {
+  background: #2a343e;
+}
+
+html[data-theme="dark"] .trace-row,
+html[data-theme="dark"] .trace-table-row,
+html[data-theme="dark"] .group-row,
+html[data-theme="dark"] .evidence-block,
+html[data-theme="dark"] .detail-pre,
+html[data-theme="dark"] .trace-heading.small,
+html[data-theme="dark"] .menu-separator {
+  border-color: #343c46;
+}
+
+html[data-theme="dark"] .bar-fill {
+  background: #6f8ea8;
+}
+
+html[data-theme="dark"] .bar-fill.status {
+  background: #4f9a75;
+}
+
+html[data-theme="dark"] .trace-row strong.ok,
+html[data-theme="dark"] .inspector-grid strong.ok,
+html[data-theme="dark"] .trace-table-row strong.ok {
+  color: #70c391;
+}
+
+html[data-theme="dark"] .trace-row strong.bad,
+html[data-theme="dark"] .inspector-grid strong.bad,
+html[data-theme="dark"] .trace-table-row strong.bad,
+html[data-theme="dark"] .detail-pre.bad,
+html[data-theme="dark"] .result-kpi.bad strong {
+  color: #ef7777;
+}

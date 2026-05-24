@@ -25,6 +25,12 @@ describe("titlebar command labels", () => {
     assert.equal(translate("zh", "command.maximize"), "最大化");
     assert.equal(translate("en", "command.close"), "Close");
     assert.equal(translate("zh", "command.close"), "关闭");
+    assert.equal(translate("en", "command.theme"), "Theme");
+    assert.equal(translate("zh", "command.theme"), "主题");
+    assert.equal(translate("en", "theme.system"), "System");
+    assert.equal(translate("zh", "theme.system"), "跟随系统");
+    assert.equal(translate("en", "theme.dark"), "Dark");
+    assert.equal(translate("zh", "theme.dark"), "暗色");
   });
 });
 

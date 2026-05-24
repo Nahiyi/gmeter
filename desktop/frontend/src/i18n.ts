@@ -9,6 +9,7 @@ export type I18nKey =
   | "command.stop"
   | "command.menu"
   | "command.language"
+  | "command.theme"
   | "command.startRun"
   | "command.stopRun"
   | "command.minimize"
@@ -18,6 +19,9 @@ export type I18nKey =
   | "command.delete"
   | "command.addUser"
   | "command.remove"
+  | "theme.system"
+  | "theme.light"
+  | "theme.dark"
   | "nav.runSetup"
   | "setup.threads"
   | "setup.rampUp"
@@ -154,6 +158,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.stop": "Stop",
     "command.menu": "Menu",
     "command.language": "Language",
+    "command.theme": "Theme",
     "command.startRun": "Start run",
     "command.stopRun": "Stop run",
     "command.minimize": "Minimize",
@@ -163,6 +168,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.delete": "Del",
     "command.addUser": "Add User",
     "command.remove": "Remove",
+    "theme.system": "System",
+    "theme.light": "Light",
+    "theme.dark": "Dark",
     "nav.runSetup": "Run Setup",
     "setup.threads": "Threads",
     "setup.rampUp": "Ramp-Up Seconds",
@@ -298,6 +306,7 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.stop": "停止",
     "command.menu": "菜单",
     "command.language": "语言",
+    "command.theme": "主题",
     "command.startRun": "开始运行",
     "command.stopRun": "停止运行",
     "command.minimize": "最小化",
@@ -307,6 +316,9 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "command.delete": "删除",
     "command.addUser": "添加用户",
     "command.remove": "移除",
+    "theme.system": "跟随系统",
+    "theme.light": "亮色",
+    "theme.dark": "暗色",
     "nav.runSetup": "运行配置",
     "setup.threads": "线程数",
     "setup.rampUp": "Ramp-Up 秒数",

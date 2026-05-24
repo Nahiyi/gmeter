@@ -6,6 +6,7 @@ const resultsCss = readFileSync(new URL("../src/styles/results.css", import.meta
 const baseCss = readFileSync(new URL("../src/styles/base.css", import.meta.url), "utf8");
 const layoutCss = readFileSync(new URL("../src/styles/layout.css", import.meta.url), "utf8");
 const summaryCss = readFileSync(new URL("../src/styles/summary.css", import.meta.url), "utf8");
+const appTsx = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 
 describe("results workbench layout css", () => {
   it("keeps trace filter labels horizontal in narrow windows", () => {
@@ -37,5 +38,12 @@ describe("results workbench layout css", () => {
     assert.match(layoutCss, /\.menu-trigger[^{]*\{[^}]*background:\s*transparent;[^}]*border-color:\s*transparent;/s);
     assert.match(layoutCss, /\.window-command[^{]*\{[^}]*width:\s*40px;[^}]*height:\s*100%;/s);
     assert.match(layoutCss, /\.minimize-icon::before[^{]*\{[^}]*top:\s*6px;[^}]*height:\s*1\.5px;/s);
+  });
+
+  it("supports dark theme and blocks browser-style zoom gestures", () => {
+    assert.match(baseCss, /html\[data-theme="dark"\][^{]*\{/s);
+    assert.match(baseCss, /color-scheme:\s*dark;/s);
+    assert.match(appTsx, /addEventListener\("wheel"[^;]+passive:\s*false/s);
+    assert.match(appTsx, /event\.ctrlKey[\s\S]+event\.preventDefault\(\)/s);
   });
 });

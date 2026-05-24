@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GetRunSnapshot, StartRun, StopRun, ValidatePlan } from "../wailsjs/go/desktop/App";
 import { desktop, engine } from "../wailsjs/go/models";
-import { EventsOn } from "../wailsjs/runtime/runtime";
+import { EventsOn, WindowSetDarkTheme, WindowSetLightTheme, WindowSetSystemDefaultTheme } from "../wailsjs/runtime/runtime";
 import { ConfigEditor } from "./components/config/ConfigEditor";
 import { ResultsWorkbench } from "./components/results/ResultsWorkbench";
 import { RunSetupPanel } from "./components/RunSetupPanel";
@@ -9,6 +9,7 @@ import { RunSummaryPanel } from "./components/RunSummaryPanel";
 import { Titlebar } from "./components/Titlebar";
 import { getSavedLocale, I18nKey, Locale, saveLocale, translate } from "./i18n";
 import { buildResultStats, LatencyRangeFilter, queryTraces, TraceFilter, TraceSort } from "./resultStats";
+import { applyThemePreference, getSavedThemePreference, saveThemePreference, ThemePreference } from "./theme";
 import type { GmeterConfig, RequestConfig, UserRow, WorkbenchView } from "./types/config";
 import { createID, headersFromRows, rowsFromHeaders } from "./utils/configRows";
 import { statusKeyFromRun } from "./utils/status";
@@ -51,6 +52,7 @@ function App() {
   const [snapshot, setSnapshot] = useState<desktop.RunSnapshot | null>(null);
   const [statusKey, setStatusKey] = useState<I18nKey>("status.idle");
   const [locale, setLocale] = useState<Locale>(getSavedLocale);
+  const [themePreference, setThemePreference] = useState<ThemePreference>(getSavedThemePreference);
   const [selectedTrace, setSelectedTrace] = useState<desktop.TraceDTO | null>(null);
   const [workbenchView, setWorkbenchView] = useState<WorkbenchView>("config");
   const [traceFilter, setTraceFilter] = useState<TraceFilter>("all");
@@ -65,6 +67,46 @@ function App() {
   ]);
   const t = (key: I18nKey) => translate(locale, key);
   const status = t(statusKey);
+
+  useEffect(() => {
+    function applyTheme() {
+      applyThemePreference(themePreference);
+      try {
+        if (themePreference === "system") WindowSetSystemDefaultTheme();
+        if (themePreference === "light") WindowSetLightTheme();
+        if (themePreference === "dark") WindowSetDarkTheme();
+      } catch {
+        // Wails runtime is not available in plain frontend test/preview contexts.
+      }
+    }
+
+    applyTheme();
+    if (themePreference !== "system") return;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", applyTheme);
+    return () => mediaQuery.removeEventListener("change", applyTheme);
+  }, [themePreference]);
+
+  useEffect(() => {
+    function preventWheelZoom(event: WheelEvent) {
+      if (event.ctrlKey) {
+        event.preventDefault();
+      }
+    }
+    function preventKeyboardZoom(event: KeyboardEvent) {
+      const isZoomShortcut = event.ctrlKey && ["+", "=", "-", "_", "0"].includes(event.key);
+      if (isZoomShortcut) {
+        event.preventDefault();
+      }
+    }
+
+    window.addEventListener("wheel", preventWheelZoom, { passive: false });
+    window.addEventListener("keydown", preventKeyboardZoom);
+    return () => {
+      window.removeEventListener("wheel", preventWheelZoom);
+      window.removeEventListener("keydown", preventKeyboardZoom);
+    };
+  }, []);
 
   useEffect(() => {
     GetRunSnapshot().then((nextSnapshot) => setSnapshot(nextSnapshot));
@@ -254,7 +296,12 @@ function App() {
         onRun={handleRun}
         onSave={handleSave}
         onStop={handleStop}
+        onThemePreferenceChange={(nextTheme) => {
+          setThemePreference(nextTheme);
+          saveThemePreference(nextTheme);
+        }}
         t={t}
+        themePreference={themePreference}
       />
 
       <section className={`workspace ${isSetupCollapsed ? "setup-collapsed" : ""} ${isSummaryCollapsed ? "summary-collapsed" : ""}`}>
