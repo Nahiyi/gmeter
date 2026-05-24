@@ -21,3 +21,14 @@ describe("titlebar command labels", () => {
     assert.equal(translate("zh", "command.stopRun"), "停止运行");
   });
 });
+
+describe("run setup side panel labels", () => {
+  it("provides labels for richer run setup summaries", () => {
+    assert.equal(translate("en", "setup.planSummary"), "Plan Summary");
+    assert.equal(translate("zh", "setup.planSummary"), "计划摘要");
+    assert.equal(translate("en", "setup.totalRequests"), "Planned Requests");
+    assert.equal(translate("zh", "setup.totalRequests"), "计划请求数");
+    assert.equal(translate("en", "setup.instantRamp"), "Instant");
+    assert.equal(translate("zh", "setup.instantRamp"), "立即启动");
+  });
+});

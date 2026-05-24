@@ -21,6 +21,16 @@ export type I18nKey =
   | "setup.loops"
   | "setup.timeout"
   | "setup.dryRun"
+  | "setup.planSummary"
+  | "setup.totalRequests"
+  | "setup.threadLoad"
+  | "setup.rampProfile"
+  | "setup.instantRamp"
+  | "setup.userProfiles"
+  | "setup.timeoutBudget"
+  | "setup.readyPlan"
+  | "layout.collapsePanel"
+  | "layout.expandPanel"
   | "request.profile"
   | "request.profileMode"
   | "request.method"
@@ -141,6 +151,16 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "setup.loops": "Loops Per Thread",
     "setup.timeout": "Request Timeout",
     "setup.dryRun": "Dry Run",
+    "setup.planSummary": "Plan Summary",
+    "setup.totalRequests": "Planned Requests",
+    "setup.threadLoad": "Thread Load",
+    "setup.rampProfile": "Ramp Profile",
+    "setup.instantRamp": "Instant",
+    "setup.userProfiles": "User Profiles",
+    "setup.timeoutBudget": "Timeout Budget",
+    "setup.readyPlan": "Ready to run after configuration review.",
+    "layout.collapsePanel": "Collapse panel",
+    "layout.expandPanel": "Expand panel",
     "request.profile": "Request Profile",
     "request.profileMode": "form + JSON preview",
     "request.method": "Method",
@@ -260,6 +280,16 @@ const dictionaries: Record<Locale, Record<I18nKey, string>> = {
     "setup.loops": "每线程循环",
     "setup.timeout": "请求超时",
     "setup.dryRun": "仅验证",
+    "setup.planSummary": "计划摘要",
+    "setup.totalRequests": "计划请求数",
+    "setup.threadLoad": "线程负载",
+    "setup.rampProfile": "启动模型",
+    "setup.instantRamp": "立即启动",
+    "setup.userProfiles": "用户配置",
+    "setup.timeoutBudget": "超时预算",
+    "setup.readyPlan": "配置检查后即可运行。",
+    "layout.collapsePanel": "折叠面板",
+    "layout.expandPanel": "展开面板",
     "request.profile": "请求配置",
     "request.profileMode": "表单 + JSON 预览",
     "request.method": "方法",

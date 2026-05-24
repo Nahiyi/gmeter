@@ -181,6 +181,18 @@
   background: #c8cdd3;
 }
 
+.workspace.setup-collapsed {
+  grid-template-columns: 42px minmax(360px, 1fr) 300px;
+}
+
+.workspace.summary-collapsed {
+  grid-template-columns: 260px minmax(360px, 1fr) 42px;
+}
+
+.workspace.setup-collapsed.summary-collapsed {
+  grid-template-columns: 42px minmax(360px, 1fr) 42px;
+}
+
 .panel {
   min-width: 0;
   min-height: 0;
@@ -213,6 +225,96 @@
 .panel-heading span {
   color: #6a737f;
   font-size: 12px;
+}
+
+.heading-actions {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 7px;
+}
+
+.collapse-button {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  border-color: transparent;
+  background: transparent;
+  padding: 0;
+  color: #4b5663;
+}
+
+.collapse-button:hover {
+  border-color: #c8cdd3;
+  background: #edf0f3;
+}
+
+.collapse-button span {
+  position: relative;
+  display: block;
+  width: 13px;
+  height: 13px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  opacity: 0.76;
+}
+
+.collapse-button span::before {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  width: 3px;
+  background: currentColor;
+  content: "";
+  opacity: 0.72;
+}
+
+.collapse-left span::before {
+  left: 1px;
+}
+
+.collapse-right span::before {
+  right: 1px;
+}
+
+.panel-collapsed {
+  display: grid;
+  place-items: stretch;
+  grid-template-rows: 1fr;
+  padding: 0;
+}
+
+.setup-panel.panel-collapsed,
+.results-panel.panel-collapsed {
+  display: grid;
+  grid-template-rows: 1fr;
+  gap: 0;
+}
+
+.rail-toggle {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: #f2f4f6;
+  padding: 0;
+  color: #4b5663;
+}
+
+.rail-toggle:hover {
+  background: #e8ecef;
+}
+
+.rail-toggle span {
+  writing-mode: vertical-rl;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
 }
 
 .workbench-heading {
@@ -248,5 +350,17 @@
 @media (max-width: 1100px) {
   .workspace {
     grid-template-columns: 230px minmax(320px, 1fr) 260px;
+  }
+
+  .workspace.setup-collapsed {
+    grid-template-columns: 42px minmax(320px, 1fr) 260px;
+  }
+
+  .workspace.summary-collapsed {
+    grid-template-columns: 230px minmax(320px, 1fr) 42px;
+  }
+
+  .workspace.setup-collapsed.summary-collapsed {
+    grid-template-columns: 42px minmax(320px, 1fr) 42px;
   }
 }

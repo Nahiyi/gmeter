@@ -57,6 +57,8 @@ function App() {
   const [traceSearch, setTraceSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [traceSort, setTraceSort] = useState<TraceSort>("latest");
+  const [isSetupCollapsed, setIsSetupCollapsed] = useState(false);
+  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
   const [consoleLines, setConsoleLines] = useState<string[]>([
     translate(getSavedLocale(), "console.ready")
   ]);
@@ -241,11 +243,14 @@ function App() {
         t={t}
       />
 
-      <section className="workspace">
+      <section className={`workspace ${isSetupCollapsed ? "setup-collapsed" : ""} ${isSummaryCollapsed ? "summary-collapsed" : ""}`}>
         <RunSetupPanel
+          isCollapsed={isSetupCollapsed}
           loops={loops}
           rampUpSeconds={rampUpSeconds}
           requestTimeoutMs={requestTimeoutMs}
+          requestURL={url}
+          setCollapsed={setIsSetupCollapsed}
           setLoops={setLoops}
           setRampUpSeconds={setRampUpSeconds}
           setRequestTimeoutMs={setRequestTimeoutMs}
@@ -253,6 +258,7 @@ function App() {
           status={status}
           t={t}
           threads={threads}
+          usersCount={users.length}
         />
 
         <section className="panel editor-panel" aria-label="Request configuration">
@@ -305,9 +311,11 @@ function App() {
 
         <RunSummaryPanel
           consoleLines={consoleLines}
+          isCollapsed={isSummaryCollapsed}
           metrics={metrics}
           recentTraces={recentTraces}
           selectedTrace={selectedTrace}
+          setCollapsed={setIsSummaryCollapsed}
           setSelectedTrace={setSelectedTrace}
           status={status}
           t={t}

@@ -57,8 +57,9 @@
 
 .trace-row {
   display: grid;
-  grid-template-columns: 1fr 54px 60px;
+  grid-template-columns: minmax(74px, 1fr) 62px 72px;
   align-items: center;
+  column-gap: 10px;
   width: 100%;
   height: auto;
   border-bottom: 1px solid #edf0f3;
@@ -84,7 +85,7 @@
 }
 
 .trace-row strong {
-  text-align: right;
+  text-align: center;
 }
 
 .trace-row strong.ok {

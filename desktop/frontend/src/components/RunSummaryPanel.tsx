@@ -3,18 +3,35 @@ import type { I18nKey } from "../i18n";
 
 export function RunSummaryPanel(props: {
   consoleLines: string[];
+  isCollapsed: boolean;
   metrics: string[][];
   recentTraces: desktop.TraceDTO[];
   selectedTrace: desktop.TraceDTO | null;
+  setCollapsed: (value: boolean) => void;
   setSelectedTrace: (trace: desktop.TraceDTO) => void;
   status: string;
   t: (key: I18nKey) => string;
 }) {
+  if (props.isCollapsed) {
+    return (
+      <aside className="panel results-panel panel-collapsed" aria-label="Run results">
+        <button type="button" className="rail-toggle" title={props.t("layout.expandPanel")} onClick={() => props.setCollapsed(false)}>
+          <span>{props.t("summary.title")}</span>
+        </button>
+      </aside>
+    );
+  }
+
   return (
     <aside className="panel results-panel" aria-label="Run results">
       <div className="panel-heading">
         <h2>{props.t("summary.title")}</h2>
-        <span>{props.status}</span>
+        <div className="heading-actions">
+          <span>{props.status}</span>
+          <button type="button" className="collapse-button collapse-right" title={props.t("layout.collapsePanel")} onClick={() => props.setCollapsed(true)}>
+            <span aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       <div className="metric-grid">
