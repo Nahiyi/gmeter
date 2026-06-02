@@ -6,6 +6,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// version is set at build time via -ldflags.
+var version = "dev"
+
 var (
 	threads        int
 	rampUp         int
@@ -30,6 +33,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.Version = version
 	rootCmd.AddCommand(runCmd)
 
 	runCmd.Flags().IntVarP(&threads, "threads", "n", 0, "Number of threads (required)")
